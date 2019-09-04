@@ -115,6 +115,11 @@ class Show
      */
     private $followings;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $id_tvdb;
+
     public function __construct()
     {
         $this->genre = new ArrayCollection();
@@ -403,6 +408,18 @@ class Show
                 $following->setTvShow(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIdTvdb(): ?int
+    {
+        return $this->id_tvdb;
+    }
+
+    public function setIdTvdb(int $id_tvdb): self
+    {
+        $this->id_tvdb = $id_tvdb;
 
         return $this;
     }
