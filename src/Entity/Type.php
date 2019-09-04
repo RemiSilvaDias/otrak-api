@@ -9,9 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource()
- * @ORM\Entity(repositoryClass="App\Repository\NetworkRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\TypeRepository")
  */
-class Network
+class Type
 {
     /**
      * @ORM\Id()
@@ -26,7 +26,7 @@ class Network
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Show", mappedBy="network")
+     * @ORM\OneToMany(targetEntity="App\Entity\Show", mappedBy="type")
      */
     private $shows;
 
@@ -64,7 +64,7 @@ class Network
     {
         if (!$this->shows->contains($show)) {
             $this->shows[] = $show;
-            $show->setNetwork($this);
+            $show->setType($this);
         }
 
         return $this;
@@ -75,8 +75,8 @@ class Network
         if ($this->shows->contains($show)) {
             $this->shows->removeElement($show);
             // set the owning side to null (unless already changed)
-            if ($show->getNetwork() === $this) {
-                $show->setNetwork(null);
+            if ($show->getType() === $this) {
+                $show->setType(null);
             }
         }
 

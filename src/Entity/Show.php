@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 
@@ -87,6 +89,38 @@ class Show
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $apiUpdate;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Genre", inversedBy="shows")
+     */
+    private $genre;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="shows")
+     */
+    private $type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Network", inversedBy="shows")
+     */
+    private $network;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Season", mappedBy="tvShow")
+     */
+    private $seasons;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="tvShow")
+     */
+    private $followings;
+
+    public function __construct()
+    {
+        $this->genre = new ArrayCollection();
+        $this->seasons = new ArrayCollection();
+        $this->followings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -257,6 +291,118 @@ class Show
     public function setApiUpdate(?\DateTimeInterface $apiUpdate): self
     {
         $this->apiUpdate = $apiUpdate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Genre[]
+     */
+    public function getGenre(): Collection
+    {
+        return $this->genre;
+    }
+
+    public function addGenre(Genre $genre): self
+    {
+        if (!$this->genre->contains($genre)) {
+            $this->genre[] = $genre;
+        }
+
+        return $this;
+    }
+
+    public function removeGenre(Genre $genre): self
+    {
+        if ($this->genre->contains($genre)) {
+            $this->genre->removeElement($genre);
+        }
+
+        return $this;
+    }
+
+    public function getType(): ?Type
+    {
+        return $this->type;
+    }
+
+    public function setType(?Type $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getNetwork(): ?Network
+    {
+        return $this->network;
+    }
+
+    public function setNetwork(?Network $network): self
+    {
+        $this->network = $network;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Season[]
+     */
+    public function getSeasons(): Collection
+    {
+        return $this->seasons;
+    }
+
+    public function addSeason(Season $season): self
+    {
+        if (!$this->seasons->contains($season)) {
+            $this->seasons[] = $season;
+            $season->setTvShow($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeason(Season $season): self
+    {
+        if ($this->seasons->contains($season)) {
+            $this->seasons->removeElement($season);
+            // set the owning side to null (unless already changed)
+            if ($season->getTvShow() === $this) {
+                $season->setTvShow(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Following[]
+     */
+    public function getFollowings(): Collection
+    {
+        return $this->followings;
+    }
+
+    public function addFollowing(Following $following): self
+    {
+        if (!$this->followings->contains($following)) {
+            $this->followings[] = $following;
+            $following->setTvShow($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(Following $following): self
+    {
+        if ($this->followings->contains($following)) {
+            $this->followings->removeElement($following);
+            // set the owning side to null (unless already changed)
+            if ($following->getTvShow() === $this) {
+                $following->setTvShow(null);
+            }
+        }
 
         return $this;
     }
