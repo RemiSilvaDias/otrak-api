@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -47,6 +49,21 @@ class User
      * @ORM\Column(type="datetime")
      */
     private $updatedAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Role", inversedBy="users")
+     */
+    private $role;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="user")
+     */
+    private $followings;
+
+    public function __construct()
+    {
+        $this->followings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -121,6 +138,49 @@ class User
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getRole(): ?Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(?Role $role): self
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Following[]
+     */
+    public function getFollowings(): Collection
+    {
+        return $this->followings;
+    }
+
+    public function addFollowing(Following $following): self
+    {
+        if (!$this->followings->contains($following)) {
+            $this->followings[] = $following;
+            $following->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(Following $following): self
+    {
+        if ($this->followings->contains($following)) {
+            $this->followings->removeElement($following);
+            // set the owning side to null (unless already changed)
+            if ($following->getUser() === $this) {
+                $following->setUser(null);
+            }
+        }
 
         return $this;
     }

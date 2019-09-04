@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -47,6 +49,21 @@ class Episode
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $image;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="episodes")
+     */
+    private $Season;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="episode")
+     */
+    private $followings;
+
+    public function __construct()
+    {
+        $this->followings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -121,6 +138,49 @@ class Episode
     public function setImage(?string $image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getSeason(): ?Season
+    {
+        return $this->Season;
+    }
+
+    public function setSeason(?Season $Season): self
+    {
+        $this->Season = $Season;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Following[]
+     */
+    public function getFollowings(): Collection
+    {
+        return $this->followings;
+    }
+
+    public function addFollowing(Following $following): self
+    {
+        if (!$this->followings->contains($following)) {
+            $this->followings[] = $following;
+            $following->setEpisode($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(Following $following): self
+    {
+        if ($this->followings->contains($following)) {
+            $this->followings->removeElement($following);
+            // set the owning side to null (unless already changed)
+            if ($following->getEpisode() === $this) {
+                $following->setEpisode(null);
+            }
+        }
 
         return $this;
     }
