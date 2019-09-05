@@ -19,6 +19,17 @@ class EpisodeRepository extends ServiceEntityRepository
         parent::__construct($registry, Episode::class);
     }
 
+    /*
+    Fonction d'affichage d'un épisode. Appel à l'API tvmaze sur le endpoint episodes avec en paramètre l'id de l'épisode à afficher.
+    */
+    public function showEpisode($episodeId){
+
+        if ($episodeId)
+        $json = file_get_contents("http://api.tvmaze.com/episodes/".$episodeId);
+
+        return $json;
+    }
+
     // /**
     //  * @return Episode[] Returns an array of Episode objects
     //  */
