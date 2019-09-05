@@ -1,0 +1,207 @@
+<?php
+
+namespace App\Entity;
+
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ApiResource()
+ * @ORM\Entity(repositoryClass="App\Repository\SeasonRepository")
+ */
+class Season
+{
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $number;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $poster;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $episodeCount;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $premiereDate;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $endDate;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="Season")
+     */
+    private $episodes;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Show", inversedBy="seasons")
+     */
+    private $tvShow;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="season")
+     */
+    private $followings;
+
+    public function __construct()
+    {
+        $this->episodes = new ArrayCollection();
+        $this->followings = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNumber(): ?int
+    {
+        return $this->number;
+    }
+
+    public function setNumber(int $number): self
+    {
+        $this->number = $number;
+
+        return $this;
+    }
+
+    public function getPoster(): ?string
+    {
+        return $this->poster;
+    }
+
+    public function setPoster(?string $poster): self
+    {
+        $this->poster = $poster;
+
+        return $this;
+    }
+
+    public function getEpisodeCount(): ?int
+    {
+        return $this->episodeCount;
+    }
+
+    public function setEpisodeCount(int $episodeCount): self
+    {
+        $this->episodeCount = $episodeCount;
+
+        return $this;
+    }
+
+    public function getPremiereDate(): ?\DateTimeInterface
+    {
+        return $this->premiereDate;
+    }
+
+    public function setPremiereDate(\DateTimeInterface $premiereDate): self
+    {
+        $this->premiereDate = $premiereDate;
+
+        return $this;
+    }
+
+    public function getEndDate(): ?\DateTimeInterface
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(?\DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Episode[]
+     */
+    public function getEpisodes(): Collection
+    {
+        return $this->episodes;
+    }
+
+    public function addEpisode(Episode $episode): self
+    {
+        if (!$this->episodes->contains($episode)) {
+            $this->episodes[] = $episode;
+            $episode->setSeason($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEpisode(Episode $episode): self
+    {
+        if ($this->episodes->contains($episode)) {
+            $this->episodes->removeElement($episode);
+            // set the owning side to null (unless already changed)
+            if ($episode->getSeason() === $this) {
+                $episode->setSeason(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTvShow(): ?Show
+    {
+        return $this->tvShow;
+    }
+
+    public function setTvShow(?Show $tvShow): self
+    {
+        $this->tvShow = $tvShow;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Following[]
+     */
+    public function getFollowings(): Collection
+    {
+        return $this->followings;
+    }
+
+    public function addFollowing(Following $following): self
+    {
+        if (!$this->followings->contains($following)) {
+            $this->followings[] = $following;
+            $following->setSeason($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(Following $following): self
+    {
+        if ($this->followings->contains($following)) {
+            $this->followings->removeElement($following);
+            // set the owning side to null (unless already changed)
+            if ($following->getSeason() === $this) {
+                $following->setSeason(null);
+            }
+        }
+
+        return $this;
+    }
+}
