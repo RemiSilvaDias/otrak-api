@@ -2,13 +2,20 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *      collectionOperations={"get"},
+ *      itemOperations={"get"},
+ *      normalizationContext={"groups"={"get_seasons"}}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\SeasonRepository")
  */
 class Season
@@ -17,46 +24,64 @@ class Season
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons"})
+     * @Assert\NotBlank
      */
     private $number;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"get_episodes", "get_seasons"})
+     * @Assert\NotBlank
      */
     private $poster;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons"})
+     * @Assert\NotBlank
      */
     private $episodeCount;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("get_seasons")
+     * @Assert\NotBlank
      */
     private $premiereDate;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("get_seasons")
      */
     private $endDate;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="Season")
+     * @ApiSubresource
+     * @Groups("get_seasons")
+     * @Assert\NotBlank
      */
     private $episodes;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Show", inversedBy="seasons")
+     * @ApiSubresource
+     * @Groups({"get_episodes", "get_seasons"})
+     * @Assert\NotBlank
      */
     private $tvShow;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="season")
+     * @Groups("get_seasons")
+     * @Assert\NotBlank
      */
     private $followings;
 

@@ -2,13 +2,20 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *      collectionOperations={"get"},
+ *      itemOperations={"get"},
+ *      normalizationContext={"groups"={"get_episodes", "get_seasons", "get_shows"}}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\ShowRepository")
  */
 class Show
@@ -17,106 +24,144 @@ class Show
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $summary;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $status;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $poster;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("get_shows")
      */
     private $website;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $rating;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Groups("get_shows")
      */
     private $language;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $slug;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank
+     * @Groups("get_shows")
      */
     private $runtime;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $id_tvmaze;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
      */
     private $id_imdb;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
      */
     private $upadtedAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("get_shows")
      */
     private $apiUpdate;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Genre", inversedBy="shows")
+     * @Groups("get_shows")
+     * @Assert\NotBlank
      */
     private $genre;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="shows")
+     * @Groups("get_shows")
+     * @Assert\NotBlank
      */
     private $type;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Network", inversedBy="shows")
+     * @Groups("get_shows")
+     * @Assert\NotBlank
      */
     private $network;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Season", mappedBy="tvShow")
+     * @ApiSubresource
+     * @Groups({"get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $seasons;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="tvShow")
+     * @Groups("get_shows")
+     * @Assert\NotBlank
      */
     private $followings;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Assert\NotBlank
      */
     private $id_tvdb;
 
