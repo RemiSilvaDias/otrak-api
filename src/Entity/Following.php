@@ -2,11 +2,16 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *      collectionOperations={"get"},
+ *      itemOperations={"get", "put"}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\FollowingRepository")
  */
 class Following
@@ -20,6 +25,7 @@ class Following
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\NotBlank
      */
     private $startDate;
 
@@ -30,26 +36,34 @@ class Following
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="followings")
+     * @Assert\NotBlank
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Episode", inversedBy="followings")
+     * @ApiSubresource
+     * @Assert\NotBlank
      */
     private $episode;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="followings")
+     * @ApiSubresource
+     * @Assert\NotBlank
      */
     private $season;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Show", inversedBy="followings")
+     * @ApiSubresource
+     * @Assert\NotBlank
      */
     private $tvShow;
 

@@ -2,13 +2,20 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *      collectionOperations={"get"},
+ *      itemOperations={"get"},
+ *      normalizationContext={"groups"={"get_episodes"}}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\EpisodeRepository")
  */
 class Episode
@@ -17,46 +24,62 @@ class Episode
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("get_episodes")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("get_episodes")
+     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups("get_episodes")
+     * @Assert\NotBlank
      */
     private $number;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups("get_episodes")
+     * @Assert\NotBlank
      */
     private $runtime;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups("get_episodes")
+     * @Assert\NotBlank
      */
     private $summary;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("get_episodes")
+     * @Assert\NotBlank
      */
     private $airstamp;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("get_episodes")
+     * @Assert\NotBlank
      */
     private $image;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="episodes")
+     * @Groups("get_episodes")
+     * @Assert\NotBlank
      */
     private $Season;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="episode")
+     * @Assert\NotBlank
      */
     private $followings;
 
