@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Utils\Cache;
 use App\Entity\Episode;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Episode|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,9 +15,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class EpisodeRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, Cache $cache)
     {
         parent::__construct($registry, Episode::class);
+        $this->catching = $cache;
     }
 
     // /**
@@ -27,9 +29,10 @@ class EpisodeRepository extends ServiceEntityRepository
     */
     public function showEpisode($episodeId){
 
-        $json = file_get_contents("http://api.tvmaze.com/episodes/".$episodeId);
-
-        return $json;
+        $data = $this->catching->toCache("http://api.tvmaze.com/episodes/".$episodeId, $episodeId);
+        
+        return $data;
+    
     }
 
 }
