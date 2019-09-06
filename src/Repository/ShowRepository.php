@@ -33,7 +33,7 @@ class ShowRepository extends ServiceEntityRepository
     /*
     Fonction d'affichage d'un show. Appel à l'API tvmaze sur le endpoint shows avec en paramètre l'id du show à afficher.
     */
-    public function showShow(){
+    public function showShow($showId){
 
         /*
         Création du cache.
@@ -47,14 +47,14 @@ class ShowRepository extends ServiceEntityRepository
         /*
         Récupère si il existe l'item show.id et le créé si il n'existe pas.
         */
-        $episodeInfo = $cache->getItem('show');
+        $episodeInfo = $cache->getItem('show'.$showId);
         
         /*
         Récupère si il existe l'item show.id et le créé si il n'existe pas.
         */
         if (!$episodeInfo->isHit()){
             
-            $episodeInfo->set(file_get_contents("http://api.tvmaze.com/shows"));
+            $episodeInfo->set(file_get_contents("http://api.tvmaze.com/shows/".$showId));
             $cache->save($episodeInfo);
             $response = $episodeInfo->get();
 

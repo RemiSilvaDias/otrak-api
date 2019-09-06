@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ShowRepository;
+use App\Repository\SeasonRepository;
 use App\Repository\EpisodeRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,6 +31,20 @@ class SearchController extends AbstractController
     {
 
         $response = $showRepository->showShow($id);
+
+        return $this->render('search/index.html.twig', [
+            'controller_name' => 'SearchController',
+            'response' => $response,
+        ]);
+    }
+
+    /**
+     * @Route("/show/{id}/season", name="season_show")
+     */
+    public function season(SeasonRepository $seasonRepository, $id)
+    {
+
+        $response = $seasonRepository->showSeason($id);
 
         return $this->render('search/index.html.twig', [
             'controller_name' => 'SearchController',

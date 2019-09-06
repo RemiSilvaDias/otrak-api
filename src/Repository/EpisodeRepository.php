@@ -24,38 +24,9 @@ class EpisodeRepository extends ServiceEntityRepository
     */
     public function showEpisode($episodeId){
 
-        if ($episodeId)
         $json = file_get_contents("http://api.tvmaze.com/episodes/".$episodeId);
 
         return $json;
     }
 
-    // /**
-    //  * @return Episode[] Returns an array of Episode objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Episode
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

@@ -18,34 +18,14 @@ class SeasonRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Season::class);
     }
-
-    
-    // /**
-    //  * @return Season[] Returns an array of Season objects
-    //  */
+ 
     /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
+    Fonction d'affichage d'un épisode. Appel à l'API tvmaze sur le endpoint seasons avec en paramètre l'id de l'épisode à afficher.
     */
+    public function showSeason($showId){
 
-    /*
-    public function findOneBySomeField($value): ?Season
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $json = file_get_contents("http://api.tvmaze.com/shows/".$showId."/seasons");
+
+        return $json;
     }
-    */
 }
