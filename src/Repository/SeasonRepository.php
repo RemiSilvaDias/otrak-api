@@ -18,9 +18,12 @@ class SeasonRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Season::class);
     }
- 
-    /*
-    Fonction d'affichage d'un épisode. Appel à l'API tvmaze sur le endpoint seasons avec en paramètre l'id de l'épisode à afficher.
+
+    
+    // /**
+    //  * @return Season[] Returns an array of Season objects
+    //  */
+    /* Fonction d'affichage d'un épisode. Appel à l'API tvmaze sur le endpoint seasons avec en paramètre l'id de l'épisode à afficher.
     */
     public function showSeason($showId){
 
