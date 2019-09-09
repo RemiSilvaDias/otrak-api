@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -92,6 +93,7 @@ class Show
 
     /**
      * @ORM\Column(type="integer")
+     * @ApiProperty(identifier=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
      * @Assert\NotBlank
      */
