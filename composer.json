@@ -8,6 +8,7 @@
         "api-platform/api-pack": "^1.2",
         "curl/curl": "^2.2",
         "doctrine/doctrine-bundle": "^1.11",
+        "lexik/jwt-authentication-bundle": "^2.6",
         "symfony/cache": "4.3.*",
         "symfony/console": "4.3.*",
         "symfony/dotenv": "4.3.*",
@@ -20,6 +21,7 @@
         "symfony/yaml": "4.3.*"
     },
     "require-dev": {
+        "hautelook/alice-bundle": "^2.5",
         "symfony/debug-pack": "^1.0",
         "symfony/profiler-pack": "^1.0",
         "symfony/var-dumper": "4.3.*",
