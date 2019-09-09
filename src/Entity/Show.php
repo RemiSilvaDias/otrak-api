@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,7 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *      collectionOperations={"get"},
- *      itemOperations={"get"},
+ *      itemOperations={
+ *          "get",
+ *          "get_show"={"route_name"="get_show"}
+ *      },
  *      normalizationContext={"groups"={"get_episodes", "get_seasons", "get_shows"}}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\ShowRepository")
@@ -24,6 +28,7 @@ class Show
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @ApiProperty(identifier=false)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
      */
     private $id;
@@ -93,6 +98,7 @@ class Show
     /**
      * @ORM\Column(type="integer")
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @ApiProperty(identifier=true)
      * @Assert\NotBlank
      */
     private $id_tvmaze;
