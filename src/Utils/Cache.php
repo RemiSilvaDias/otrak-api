@@ -12,7 +12,6 @@ class Cache {
 
     public function toCache($dataToCache, $id){
 
-        dump($dataToCache);
         /*
         Création du cache.
         */
@@ -25,11 +24,8 @@ class Cache {
         /*
         Récupère si il existe l'item data.id et le créé si il n'existe pas.
         */
-        $data = $cache->getItem('data'.$id);
-        dump($data);
-        /*
+        $data = $cache->getItem('data-'.$id);
 
-        */
         if (!$data->isHit()){
             
             $data->set(file_get_contents("$dataToCache"));
@@ -40,9 +36,7 @@ class Cache {
 
         } else {
 
-            // $json = file_get_contents("http://api.tvmaze.com/shows/".$showId);
             $response = $data->get();
-
             
             return $response;
         }

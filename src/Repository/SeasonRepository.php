@@ -20,15 +20,15 @@ class SeasonRepository extends ServiceEntityRepository
     }
 
     
-    // /**
-    //  * @return Season[] Returns an array of Season objects
-    //  */
+    /**
+     * @return Season[] Returns an array of Season objects
+     */
     /* Fonction d'affichage d'un épisode. Appel à l'API tvmaze sur le endpoint seasons avec en paramètre l'id de l'épisode à afficher.
     */
     public function showSeason($showId){
 
-        $json = file_get_contents("http://api.tvmaze.com/shows/".$showId."/seasons");
+        $data = file_get_contents("http://api.tvmaze.com/shows/".$showId."/seasons");
 
-        return $json;
+        return $data;
     }
 }
