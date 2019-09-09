@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Show;
+use App\Utils\Cache;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -18,16 +21,17 @@ class ShowRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Show::class);
-
+    
     }
     /*
     Fonction de recherche. Appel à l'API tvmaze sur le endpoint search avec en paramètre l'input de la recherche.
     */
-    public function searchShow($query){
+    public function searchShow($search){
 
-        $json = file_get_contents("http://api.tvmaze.com/search/shows?q=".$query);
+        $data = file_get_contents("http://api.tvmaze.com/search/shows?q=".$search);
 
-        return $json;
+        return $data;
+        
     }
 
     /*
@@ -35,38 +39,25 @@ class ShowRepository extends ServiceEntityRepository
     */
     public function showShow($showId){
 
-        /*
-        Création du cache.
-        */
-        $cache = new FilesystemAdapter(
+        // $response = new Response();
 
-            $namespace = '',
-            $defaultLifetime = 20
-        );
-        
-        /*
-        Récupère si il existe l'item show.id et le créé si il n'existe pas.
-        */
-        $episodeInfo = $cache->getItem('show'.$showId);
-        
-        /*
-        Récupère si il existe l'item show.id et le créé si il n'existe pas.
-        */
-        if (!$episodeInfo->isHit()){
-            
-            $episodeInfo->set(file_get_contents("http://api.tvmaze.com/shows/".$showId));
-            $cache->save($episodeInfo);
-            $response = $episodeInfo->get();
+        // $code = $response->getStatusCode("http://api.tvmaze.com/shows/".$showId);
+    
+        // dump($response);
 
-            return $response;
+        // if (!$code = 200){
 
-        } else {
+        // return null;
 
-            // $json = file_get_contents("http://api.tvmaze.com/shows/".$showId);
-            $response = $episodeInfo->get();
+        // }else{
 
-            return $response;
+        //     $json = file_get_contents("http://api.tvmaze.com/shows/".$showId);
 
-        }
+        //     return $json;
+        // }
+
+        $data = file_get_contents("http://api.tvmaze.com/shows/".$showId);
+
+        return $data;
     }
 }
