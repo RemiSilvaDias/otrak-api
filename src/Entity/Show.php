@@ -16,11 +16,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      collectionOperations={"get"},
  *      itemOperations={
  *          "get",
- *          "get_show"={"route_name"="get_show"}
  *      },
- *      normalizationContext={"groups"={"get_episodes", "get_seasons", "get_shows"}}
+ *      normalizationContext={"groups"={"get_episodes", "get_seasons", "get_shows"}, "enable_max_depth"=true},
+ *      attributes={
+ *          "force_eager"=false,
+ *      }
  * )
+ * 
  * @ORM\Entity(repositoryClass="App\Repository\ShowRepository")
+ * @ORM\Table(name="tvshow")
  */
 class Show
 {
@@ -28,7 +32,6 @@ class Show
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @ApiProperty(identifier=false)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
      */
     private $id;
@@ -97,9 +100,7 @@ class Show
 
     /**
      * @ORM\Column(type="integer")
-     * @ApiProperty(identifier=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @ApiProperty(identifier=true)
      * @Assert\NotBlank
      */
     private $id_tvmaze;

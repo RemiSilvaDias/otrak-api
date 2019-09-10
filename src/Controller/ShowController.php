@@ -14,33 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class ShowController extends AbstractController
 {
-    private $showRepository;
-
-    public function __construct(ShowRepository $showRepository)
-    {
-        // $this->showHandler = $showHandler;
-        $this->showRepository = $showRepository;
-    }
-    
-    /**
-     * @Route(
-     *      name="get_show",
-     *      path="/shows/{id}",
-     *      requirements={"id"="\d+"},
-     *      methods={"GET"},
-     *      defaults={
-     *          "_api_resource_class"=Show::class,
-     *          "_api_item_operation_name"="",
-     * })
-     */
-    public function __invoke(Show $data): Show
-    {
-        // $this->showHandler->handle($data);
-        dd($data);
-
-        return $data;
-    }
-
     /**
      * @Route("/shows/search/{search}", requirements={"search"="\w+"}, methods={"GET"})
      */
