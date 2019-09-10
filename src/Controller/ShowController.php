@@ -24,16 +24,13 @@ class ShowController extends AbstractController
         $data = ApiController::retrieveData("search", "show", $search);
         $data = \json_decode($data);
 
-        foreach ($data as $currentResponse) {
-            $currentResponse->show->test = 'value';
-            // dd($currentResponse->show);
-            // dd($currentResponse);
-        }
-
-        dd($data);
+        // if we want to add data to the response
+        // foreach ($data as $currentResponse) {
+        //     $currentResponse->show->test = 'value';
+        // }
 
         $jsonResponse = new JsonResponse($data);
-        // return $data;
+        
         return $jsonResponse;
     }
 }
