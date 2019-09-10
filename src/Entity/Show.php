@@ -97,6 +97,7 @@ class Show
 
     /**
      * @ORM\Column(type="integer")
+     * @ApiProperty(identifier=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
      * @ApiProperty(identifier=true)
      * @Assert\NotBlank
