@@ -38,6 +38,9 @@ class ApiController extends AbstractController
                 case 'show':
                 $data = file_get_contents("http://api.tvmaze.com/shows/".$id);
                 break;
+                case 'showFull':
+                $data = file_get_contents("http://api.tvmaze.com/shows/".$id."?embed=cast");
+                break;
                 case 'season':
                 $data = file_get_contents("http://api.tvmaze.com/shows/".$id."/seasons");
                 break;
@@ -54,7 +57,7 @@ class ApiController extends AbstractController
         }
         
         $data = \json_decode($data);
-        dd($data);
+        // dd($data);
         return $data;
         
         // $jsonResponse = new JsonResponse($data);

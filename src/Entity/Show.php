@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,10 +14,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *      collectionOperations={"get"},
- *      itemOperations={"get"},
- *      normalizationContext={"groups"={"get_episodes", "get_seasons", "get_shows"}}
+ *      itemOperations={
+ *          "get",
+ *      },
+ *      normalizationContext={"groups"={"get_episodes", "get_seasons", "get_shows"}, "enable_max_depth"=true},
+ *      attributes={
+ *          "force_eager"=false,
+ *      }
  * )
+ * 
  * @ORM\Entity(repositoryClass="App\Repository\ShowRepository")
+ * @ORM\Table(name="tvshow")
  */
 class Show
 {

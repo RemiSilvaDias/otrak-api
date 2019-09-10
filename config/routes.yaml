@@ -4,3 +4,11 @@
 auth_check:
     path: /api/auth_check
     methods: ['POST']
+
+api_countries_get_item:
+    path: '/api/show/{id}'
+    methods:  ['GET']
+    defaults:
+        _controller: '\AppBundle\Controller\GetShow::getComplete'
+        _api_resource_class: 'AppBundle\Entity\Show'
+        _api_item_operation_name: 'getComplete'
