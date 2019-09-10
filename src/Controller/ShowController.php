@@ -18,11 +18,21 @@ class ShowController extends AbstractController
      */
     public function searchShows(string $search, Request $request, ShowRepository $showRepository)
     {
-        // $search = str_replace("+", " ", $search);
+        $search = str_replace("+", " ", $search);
 
-        // $data = ApiController::retrieveData("search", "show", $search);
+        $data = ApiController::retrieveData("search", "show", $search);
+        $data = \json_decode($data);
 
-        // $jsonResponse = new JsonResponse($shows);
-        // return $jsonResponse;
+        foreach ($data as $currentResponse) {
+            $currentResponse->show->test = 'value';
+            // dd($currentResponse->show);
+            // dd($currentResponse);
+        }
+
+        dd($data);
+
+        $jsonResponse = new JsonResponse($data);
+        // return $data;
+        return $jsonResponse;
     }
 }

@@ -52,7 +52,8 @@ class ApiController extends AbstractController
             // $showRepository = new ShowRepository();
             $response = ShowRepository::searchShow($id);
             // $endpoint = "http://api.tvmaze.com/search/shows?q=".$id;
-            return new Response ($response);
+            // return new Response ($response);
+            return $response;
             
         }elseif($action == 'get' && $target == 'show'){
             
