@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Episode;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Episode|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,17 +19,7 @@ class EpisodeRepository extends ServiceEntityRepository
         parent::__construct($registry, Episode::class);
     }
 
-    // /**
-    //  * @return Episode[] Returns an array of Episode objects
-    //  */
-    /*
-    Fonction d'affichage d'un épisode. Appel à l'API tvmaze sur le endpoint episodes avec en paramètre l'id de l'épisode à afficher.
-    */
-    public function showEpisode($episodeId){
-
-        $json = file_get_contents("http://api.tvmaze.com/episodes/".$episodeId);
-
-        return $json;
-    }
-
 }
+
+
+

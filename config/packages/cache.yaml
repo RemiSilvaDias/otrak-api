@@ -17,3 +17,6 @@ framework:
         # Namespaced pools use the above "app" backend by default
         #pools:
             #my.dedicated.cache: null
+        # directory: '%kernel.cache_dir%/pools'
+        # app: cache.adapter.filesystem
+        # system: cache.adapter.system
