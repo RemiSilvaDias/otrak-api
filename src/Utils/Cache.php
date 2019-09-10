@@ -10,7 +10,7 @@ class Cache {
 
     }
 
-    public function toCache($dataToCache, $id){
+    public function toCache($dataToCache, $target, $id){
 
         /*
         Création du cache.
@@ -24,7 +24,7 @@ class Cache {
         /*
         Récupère si il existe l'item data.id et le créé si il n'existe pas.
         */
-        $data = $cache->getItem('data-'.$id);
+        $data = $cache->getItem('data-'.$target.$id);
 
         if (!$data->isHit()){
             
