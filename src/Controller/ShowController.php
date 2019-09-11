@@ -68,8 +68,6 @@ class ShowController extends AbstractController
             return $item2->airstamp <=> $item1->airstamp;
         });
 
-        // dd($episodesApi);
-
         foreach ($episodesApi as $response) {
             $episodes[] = array(
                 'show_name' => $response->show->name,
