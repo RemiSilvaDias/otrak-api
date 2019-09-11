@@ -19,4 +19,15 @@ class SeasonRepository extends ServiceEntityRepository
         parent::__construct($registry, Season::class);
     }
 
+    public function findSeasonByShow($show, $seasonNumber)
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.show = :show')
+            ->andWhere('s.number = :num')
+            ->setParameter('show', $show)
+            ->setParameter('num', $seasonNumber)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

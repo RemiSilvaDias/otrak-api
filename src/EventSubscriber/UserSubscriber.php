@@ -46,7 +46,6 @@ class UserSubscriber implements EventSubscriberInterface
         }
 
         if (Request::METHOD_POST === $method) {
-            if (!$token) return;
             $user->setUpdatedAt(new \DateTime());
         }
     }
