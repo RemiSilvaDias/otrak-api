@@ -19,6 +19,19 @@ class EpisodeRepository extends ServiceEntityRepository
         parent::__construct($registry, Episode::class);
     }
 
+    public function findEpisode($show, $season, $episodeNumber)
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.show = :show')
+            ->andWhere('e.season = :season')
+            ->andWhere('e.number = :num')
+            ->setParameter('show', $show)
+            ->setParameter('season', $season)
+            ->setParameter('num', $episodeNumber)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }
 
 

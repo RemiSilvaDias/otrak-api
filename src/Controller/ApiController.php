@@ -20,7 +20,7 @@ class ApiController extends AbstractController
         $this->catching = $cache;
     }
 
-     /**
+    /**
      * @Route("/test/{action}/{target}/{id}", name="test")
      */
     public function retrieveData($action, $target, $id){

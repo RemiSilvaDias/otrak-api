@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Show;
+use App\Controller\ApiController;
 use App\Repository\ShowRepository;
+use App\Repository\SeasonRepository;
+use App\Repository\EpisodeRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,21 +18,29 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ShowController extends AbstractController
 {
     /**
-     * @Route("/shows/search/{search}", requirements={"search"="\w+"}, methods={"GET"})
+     * @Route("/shows/search/{search}", methods={"GET"})
      */
     public function searchShows(string $search, Request $request, ShowRepository $showRepository)
     {
+        $shows = [];
         $search = str_replace("+", " ", $search);
 
         $data = ApiController::retrieveData("search", "show", $search);
-        $data = \json_decode($data);
 
-        // if we want to add data to the response
-        // foreach ($data as $currentResponse) {
-        //     $currentResponse->show->test = 'value';
-        // }
+        foreach ($data as $response) {
+            $shows[] = array(
+                'name' => $response->show->name,
+                'status' => 0,
+                'poster' => $response->show->image->original,
+                'rating' => $response->show->rating->average,
+                'language' => $response->show->language,
+                'runtime' => $response->show->runtime,
+                'id_tvmaze' => $response->show->id,
+                'premiered' => $response->show->premiered,
+            );
+        }
 
-        $jsonResponse = new JsonResponse($data);
+        $jsonResponse = new JsonResponse($shows);
         
         return $jsonResponse;
     }
