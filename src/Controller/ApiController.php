@@ -9,16 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ApiController extends AbstractController
 {
-
-    public function __construct(AdapterInterface $cache)
-    {
-        $this->catching = $cache;
-    }
 
     /**
      * @Route("/test/{action}/{target}/{id}", name="test")
@@ -27,6 +22,11 @@ class ApiController extends AbstractController
     
         
         $data = null ;
+
+        $cache = new FilesystemAdapter(
+            $namespace = '',
+            $defaultLifetime = 20
+        );
 
         if ($action == 'search'){
 
@@ -56,21 +56,17 @@ class ApiController extends AbstractController
                 break;
             }
         }
-
+        
         /*
         * Vérification de la présence de la donnée dans le cache, mise en cache si non trouvée.
         */
-        $data = $this->catching->getItem('data-'.md5($target.$id));
+        $data = $cache->getItem('data-'.md5($target.$id));
 
         if (!$data->isHit()){    
 
             $header = get_headers($endpoint)[0];
 
             if (!preg_match('/.*\s2.*/', $header)){
-
-                // return $this->render('search/index.html.twig',[
-                //     'data' => null
-                // ]);
 
                 $jsonResponse = new JsonResponse(null);
                 return $jsonResponse;
@@ -79,25 +75,14 @@ class ApiController extends AbstractController
             $data->set(file_get_contents($endpoint));
     
             $data->expiresAfter(20);
-            $this->catching->save($data);
+            $cache->save($data);
         } 
 
         $response = $data->get();
 
         $data = \json_decode($response);
 
-        /*
-        * pour les tests, pour afficher sur un twig
-        */
-        // return $this->render('search/index.html.twig',[
-        //     'data' => $data
-         
-        // ]);
+        return $data;
 
-        /*
-        * à décommenter à terme pour renvoyer en format Json.
-        */
-        $jsonResponse = new JsonResponse($data);
-        return $jsonResponse;
     }
 }
