@@ -34,19 +34,48 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
         if ($show === null) {
             $showApi = ApiController::retrieveData('get', 'showFull', $id);
 
+            $name = $showApi->name;
+
+            $summary = '';
+            if (!is_null($showApi->summary)) $summary = $showApi->summary;
+
+            $status = 0;
+            if (!is_null($showApi->status)) $status = $showApi->status;
+
+            $poster = '';
+            if (!is_null($showApi->image)) $poster = $showApi->image->original;
+
+            $website = '';
+            if (!is_null($showApi->officialSite)) $website = $showApi->officialSite;
+
+            $rating = null;
+            if (!is_null($showApi->rating->average)) $rating = $showApi->rating->average;
+
+            $language = '';
+            if (!is_null($showApi->language)) $language = $showApi->language;
+
+            $runtime = 0;
+            if (!is_null($showApi->runtime)) $runtime = $showApi->runtime;
+
+            $idTvDb = null;
+            if (!is_null($showApi->thetvdb)) $idTvDb = $showApi->thetvdb;
+
+            $cast = null;
+            if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
+
             $show = new JsonResponse([
-                'name' => $showApi->name,
-                'summary' => $showApi->summary,
+                'name' => $name,
+                'summary' => $summary,
                 'status' => 0,
-                'poster' => $showApi->image->original,
-                'website' => $showApi->officialSite,
-                'rating' => $showApi->rating->average,
-                'language' => $showApi->language,
-                'runtime' => $showApi->runtime,
+                'poster' => $poster,
+                'website' => $website,
+                'rating' => $rating,
+                'language' => $language,
+                'runtime' => $runtime,
                 'id_tvmaze' => $showApi->id,
-                'id_tvdb' => $showApi->externals->thetvdb,
+                'id_tvdb' => $idTvDb,
                 'api_update' => $showApi->updated,
-                'cast' => $showApi->_embedded->cast,
+                'cast' => $cast,
             ]);
 
             return $show;
