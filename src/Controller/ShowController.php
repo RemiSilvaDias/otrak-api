@@ -28,13 +28,28 @@ class ShowController extends AbstractController
         $data = ApiController::retrieveData("search", "show", $search);
 
         foreach ($data as $response) {
+            $name = $response->show->name;
+            $status = 0;
+
+            $poster = '';
+            if (!is_null($response->show->image)) $poster = $response->show->image->original;
+
+            $rating = null;
+            if (!is_null($response->show->rating) && !is_null($response->show->rating->average)) $rating = $response->show->rating->average;
+
+            $language = '';
+            if (!is_null($response->show->language)) $language = $response->show->language;
+
+            $runtime = 0;
+            if (!is_null($response->show->runtime)) $runtime = $response->show->runtime;
+
             $shows[] = array(
-                'name' => $response->show->name,
-                'status' => 0,
-                'poster' => $response->show->image->original,
-                'rating' => $response->show->rating->average,
-                'language' => $response->show->language,
-                'runtime' => $response->show->runtime,
+                'name' => $name,
+                'status' => $status,
+                'poster' => $poster,
+                'rating' => $rating,
+                'language' => $language,
+                'runtime' => $runtime,
                 'id_tvmaze' => $response->show->id,
                 'premiered' => $response->show->premiered,
             );
@@ -69,12 +84,15 @@ class ShowController extends AbstractController
         });
 
         foreach ($episodesApi as $response) {
+            $poster = '';
+            if (!is_null($response->image)) $poster = $response->image->original;
+
             $episodes[] = array(
                 'show_name' => $response->show->name,
                 'name' => $response->name,
                 'season' => $response->season,
                 'number' => $response->number,
-                'poster' => $response->show->image->original,
+                'poster' => $poster,
                 'show_id_tvmaze' => $response->show->id,
                 'id_tvmaze' => $response->id,
                 'airstamp' => $response->airstamp,
