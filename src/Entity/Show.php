@@ -39,28 +39,24 @@ class Show
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="text")
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $summary;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $status;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $poster;
 
@@ -71,15 +67,13 @@ class Show
     private $website;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="float", nullable=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $rating;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("get_shows")
      */
     private $language;
@@ -87,13 +81,11 @@ class Show
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $slug;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Assert\NotBlank
+     * @ORM\Column(type="integer", nullable=true)
      * @Groups("get_shows")
      */
     private $runtime;
@@ -106,7 +98,7 @@ class Show
     private $id_tvmaze;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
      */
     private $id_imdb;
@@ -114,7 +106,6 @@ class Show
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $createdAt;
 
@@ -125,7 +116,7 @@ class Show
     private $upadtedAt;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="integer", nullable=true)
      * @Groups("get_shows")
      */
     private $apiUpdate;
@@ -133,21 +124,18 @@ class Show
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Genre", inversedBy="shows")
      * @Groups("get_shows")
-     * @Assert\NotBlank
      */
     private $genre;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="shows")
      * @Groups("get_shows")
-     * @Assert\NotBlank
      */
     private $type;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Network", inversedBy="shows")
      * @Groups("get_shows")
-     * @Assert\NotBlank
      */
     private $network;
 
@@ -155,23 +143,26 @@ class Show
      * @ORM\OneToMany(targetEntity="App\Entity\Season", mappedBy="tvShow")
      * @ApiSubresource
      * @Groups({"get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $seasons;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="tvShow")
      * @Groups("get_shows")
-     * @Assert\NotBlank
      */
     private $followings;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
-     * @Assert\NotBlank
      */
     private $id_tvdb;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("get_shows")
+     */
+    private $premiered;
 
     public function __construct()
     {
@@ -473,6 +464,18 @@ class Show
     public function setIdTvdb(int $id_tvdb): self
     {
         $this->id_tvdb = $id_tvdb;
+
+        return $this;
+    }
+
+    public function getPremiered(): ?string
+    {
+        return $this->premiered;
+    }
+
+    public function setPremiered(?string $premiered): self
+    {
+        $this->premiered = $premiered;
 
         return $this;
     }
