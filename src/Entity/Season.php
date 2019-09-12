@@ -31,28 +31,24 @@ class Season
     /**
      * @ORM\Column(type="integer")
      * @Groups({"get_episodes", "get_seasons"})
-     * @Assert\NotBlank
      */
     private $number;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"get_episodes", "get_seasons"})
-     * @Assert\NotBlank
      */
     private $poster;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @Groups({"get_episodes", "get_seasons"})
-     * @Assert\NotBlank
      */
     private $episodeCount;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups("get_seasons")
-     * @Assert\NotBlank
      */
     private $premiereDate;
 
@@ -66,7 +62,6 @@ class Season
      * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="Season")
      * @ApiSubresource
      * @Groups("get_seasons")
-     * @Assert\NotBlank
      */
     private $episodes;
 
@@ -74,14 +69,12 @@ class Season
      * @ORM\ManyToOne(targetEntity="App\Entity\Show", inversedBy="seasons")
      * @ApiSubresource
      * @Groups({"get_episodes", "get_seasons"})
-     * @Assert\NotBlank
      */
     private $tvShow;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="season")
      * @Groups("get_seasons")
-     * @Assert\NotBlank
      */
     private $followings;
 
