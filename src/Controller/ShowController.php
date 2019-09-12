@@ -44,4 +44,45 @@ class ShowController extends AbstractController
         
         return $jsonResponse;
     }
+
+    /**
+     * @Route("/shows/aired", methods={"GET"})
+     */
+    public function aired()
+    {
+        $episodesApi = [];
+        $episodes = [];
+
+        $series = ApiController::retrieveData("get", "scheduleEpisodes", null);
+        $animes = ApiController::retrieveData("get", "scheduleAnimeEpisodes", null);
+
+        foreach ($series as $serie) {
+            $episodesApi[] = $serie;
+        }
+
+        foreach ($animes as $anime) {
+            $episodesApi[] = $anime;
+        }
+
+        \usort($episodesApi, function($item1, $item2) {
+            return $item2->airstamp <=> $item1->airstamp;
+        });
+
+        foreach ($episodesApi as $response) {
+            $episodes[] = array(
+                'show_name' => $response->show->name,
+                'name' => $response->name,
+                'season' => $response->season,
+                'number' => $response->number,
+                'poster' => $response->show->image->original,
+                'show_id_tvmaze' => $response->show->id,
+                'id_tvmaze' => $response->id,
+                'airstamp' => $response->airstamp,
+            );
+        }
+
+        $jsonResponse = new JsonResponse($episodes);
+        
+        return $jsonResponse;
+    }
 }
