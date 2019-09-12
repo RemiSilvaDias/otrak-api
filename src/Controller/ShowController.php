@@ -24,7 +24,7 @@ class ShowController extends AbstractController
     {
         $shows = [];
         $search = str_replace("+", " ", $search);
-
+        
         $data = ApiController::retrieveData("search", "show", $search);
 
         foreach ($data as $response) {
@@ -53,8 +53,8 @@ class ShowController extends AbstractController
         $episodesApi = [];
         $episodes = [];
 
-        $series = ApiController::retrieveData("get", "scheduleEpisodes", null);
-        $animes = ApiController::retrieveData("get", "scheduleAnimeEpisodes", null);
+        $series = ApiController::retrieveData("get", "scheduleEpisodes", 'scheduleUS');
+        $animes = ApiController::retrieveData("get", "scheduleAnimeEpisodes", 'scheduleJP');
 
         foreach ($series as $serie) {
             $episodesApi[] = $serie;
