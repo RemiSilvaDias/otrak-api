@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * )
  * 
  * @ORM\Entity(repositoryClass="App\Repository\ShowRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="tvshow")
  */
 class Show
@@ -113,7 +114,7 @@ class Show
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups({"get_episodes", "get_seasons", "get_shows"})
      */
-    private $upadtedAt;
+    private $updatedAt;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -163,6 +164,26 @@ class Show
      * @Groups("get_shows")
      */
     private $premiered;
+
+    /**
+    * @ORM\PrePersist
+    */
+    public function setCreatedAtValue()
+    {
+        $this->createdAt = new \DateTime();
+
+        return $this;
+    }
+
+    /**
+    * @ORM\PreUpdate
+    */
+    public function setUpdatedAtValue()
+    {
+        $this->updatedAt = new \DateTime();
+
+        return $this;
+    }
 
     public function __construct()
     {
@@ -320,14 +341,14 @@ class Show
         return $this;
     }
 
-    public function getUpadtedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->upadtedAt;
+        return $this->updatedAt;
     }
 
-    public function setUpadtedAt(?\DateTimeInterface $upadtedAt): self
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
-        $this->upadtedAt = $upadtedAt;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
