@@ -56,4 +56,19 @@ class UserController extends AbstractController
 
         return $jsonResponse;
     }
+
+    /**
+     * User login route
+     * 
+     * @Route("/login_check", name="login", methods={"POST"})
+     */
+    public function login(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        return new JsonResponse([
+            'username' => $user->getUsername(),
+            'role' => $user->getRoles(),
+        ]);
+    }
 }
