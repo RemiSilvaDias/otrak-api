@@ -71,7 +71,7 @@ class Following
     /**
     * @ORM\PrePersist
     */
-    public function setStartDateValue(\DateTimeInterface $startDate)
+    public function setStartDateValue()
     {
         if ($this->startDate == null)
         {

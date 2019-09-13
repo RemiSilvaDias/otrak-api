@@ -168,7 +168,7 @@ class Show
     /**
     * @ORM\PrePersist
     */
-    public function setCreatedAtValue(\DateTimeInterface $createdAt)
+    public function setCreatedAtValue()
     {
         $this->createdAt = new \DateTime();
 
@@ -178,7 +178,7 @@ class Show
     /**
     * @ORM\PreUpdate
     */
-    public function setUpdatedAtValue(\DateTimeInterface $updateAt)
+    public function setUpdatedAtValue()
     {
         $this->updatedAt = new \DateTime();
 

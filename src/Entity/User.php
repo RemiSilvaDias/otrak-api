@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -170,7 +171,7 @@ class User
     /**
     * @ORM\PrePersist
     */
-    public function setCreatedAtValue(\DateTimeInterface $createdAt)
+    public function setCreatedAtValue()
     {
         $this->createdAt = new \DateTime();
 
@@ -180,7 +181,7 @@ class User
     /**
     * @ORM\PreUpdate
     */
-    public function setUpdatedAtValue(\DateTimeInterface $updateAt)
+    public function setUpdatedAtValue()
     {
         $this->updatedAt = new \DateTime();
 
