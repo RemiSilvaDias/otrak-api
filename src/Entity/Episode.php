@@ -31,55 +31,47 @@ class Episode
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("get_episodes")
-     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("get_episodes")
-     * @Assert\NotBlank
      */
     private $number;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @Groups("get_episodes")
-     * @Assert\NotBlank
      */
     private $runtime;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      * @Groups("get_episodes")
-     * @Assert\NotBlank
      */
     private $summary;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups("get_episodes")
-     * @Assert\NotBlank
      */
     private $airstamp;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("get_episodes")
-     * @Assert\NotBlank
      */
     private $image;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="episodes")
      * @Groups("get_episodes")
-     * @Assert\NotBlank
      */
     private $Season;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="episode")
-     * @Assert\NotBlank
      */
     private $followings;
 

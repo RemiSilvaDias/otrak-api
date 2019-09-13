@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      itemOperations={"get", "put", "delete"}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\FollowingRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Following
 {
@@ -66,6 +67,19 @@ class Following
      * @Assert\NotBlank
      */
     private $tvShow;
+
+    /**
+    * @ORM\PrePersist
+    */
+    public function setStartDateValue()
+    {
+        if ($this->startDate == null)
+        {
+            $this->startDate = new \DateTime();
+            
+            return $this;
+        }
+    }
 
     public function getId(): ?int
     {
