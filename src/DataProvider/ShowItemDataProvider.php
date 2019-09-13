@@ -33,6 +33,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
 
         if ($show === null) {
             $showApi = ApiController::retrieveData('get', 'showFull', $id);
+            dump($showApi);
 
             $name = $showApi->name;
 
@@ -58,7 +59,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             if (!is_null($showApi->runtime)) $runtime = $showApi->runtime;
 
             $idTvDb = null;
-            if (!is_null($showApi->thetvdb)) $idTvDb = $showApi->thetvdb;
+            if (!is_null($showApi->externals->thetvdb)) $idTvDb = $showApi->externals->thetvdb;
 
             $cast = null;
             if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;

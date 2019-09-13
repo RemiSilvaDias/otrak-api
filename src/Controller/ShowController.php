@@ -85,7 +85,7 @@ class ShowController extends AbstractController
 
         foreach ($episodesApi as $response) {
             $poster = '';
-            if (!is_null($response->image)) $poster = $response->image->original;
+            if (!is_null($response->show->image)) $poster = $response->show->image->original;
 
             $episodes[] = array(
                 'show_name' => $response->show->name,
