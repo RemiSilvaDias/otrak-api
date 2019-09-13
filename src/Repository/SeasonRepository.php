@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Season;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Season|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,10 +22,9 @@ class SeasonRepository extends ServiceEntityRepository
     public function findSeasonByShow($show, $seasonNumber)
     {
         return $this->createQueryBuilder('s')
-            ->where('s.show = :show')
+            ->where('s.tvShow = :show')
             ->andWhere('s.number = :num')
-            ->setParameter('show', $show)
-            ->setParameter('num', $seasonNumber)
+            ->setParameters(['show' => $show, 'num' => $seasonNumber])
             ->getQuery()
             ->getOneOrNullResult()
         ;
