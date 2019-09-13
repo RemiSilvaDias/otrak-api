@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 class UserController extends AbstractController
 {
     /**
-     * Test custom route for API
+     * User creation route
      * 
      * @Route("/users/new", methods={"POST"})
      */
@@ -30,7 +30,7 @@ class UserController extends AbstractController
 
         $user = $userRepository->findOneByEmail($email);
 
-        if ($user != null) {
+        if (!is_null($user)) {
             return new JsonResponse([
                 'response' => 'error',
                 'message' => 'Email already exists'
@@ -55,5 +55,20 @@ class UserController extends AbstractController
         $jsonResponse = new JsonResponse(['response' => 'success']);
 
         return $jsonResponse;
+    }
+
+    /**
+     * User login route
+     * 
+     * @Route("/login_check", name="login", methods={"POST"})
+     */
+    public function login(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        return new JsonResponse([
+            'username' => $user->getUsername(),
+            'role' => $user->getRoles(),
+        ]);
     }
 }
