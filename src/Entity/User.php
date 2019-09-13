@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      itemOperations={"get", "put"}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity("email")
  */
 class User
@@ -162,6 +163,26 @@ class User
     public function setRole(?Role $role): self
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+    * @ORM\PrePersist
+    */
+    public function setCreatedAtValue(\DateTimeInterface $createdAt)
+    {
+        $this->createdAt = new \DateTime();
+
+        return $this;
+    }
+
+    /**
+    * @ORM\PreUpdate
+    */
+    public function setUpdatedAtValue(\DateTimeInterface $updateAt)
+    {
+        $this->updatedAt = new \DateTime();
 
         return $this;
     }
