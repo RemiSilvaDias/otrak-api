@@ -12,15 +12,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-/**
- * @route("/api")
- */
 class UserController extends AbstractController
 {
     /**
      * User creation route
      * 
-     * @Route("/users/new", methods={"POST"})
+     * @Route("/api/users/new", methods={"POST"})
      */
     public function new(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder, RoleRepository $roleRepository, EntityManagerInterface $em)
     {
@@ -60,15 +57,16 @@ class UserController extends AbstractController
     /**
      * User login route
      * 
-     * @Route("/login_check", name="login", methods={"POST"})
+     * @Route("/api/login", name="login", methods={"POST"})
      */
-    public function login(): JsonResponse
+    public function login(Request $request)
     {
         $user = $this->getUser();
 
         return new JsonResponse([
-            'username' => $user->getUsername(),
-            'role' => $user->getRoles(),
+            // 'username' => $user->getUsername(),
+            // 'role' => $user->getRoles(),
+            'user' => $user,
         ]);
     }
 }
