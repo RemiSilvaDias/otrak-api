@@ -139,7 +139,7 @@ class ShowController extends AbstractController
 
             if (is_null($genre) && !is_null($response->show->genres)) $genre = $response->show->genres;
 
-            if (!is_null($rating) && !is_null($response->show->rating)) $rating = $response->show->rating->average;
+            if (is_null($rating) && !is_null($response->show->rating)) $rating = $response->show->rating->average;
             if ($language == '' && !is_null($response->show->language)) $language = $response->show->language;
 
             $episodes[] = array(
