@@ -262,7 +262,7 @@ class Show
         return $this->rating;
     }
 
-    public function setRating(int $rating): self
+    public function setRating(?int $rating): self
     {
         $this->rating = $rating;
 
@@ -317,12 +317,12 @@ class Show
         return $this;
     }
 
-    public function getIdImdb(): ?int
+    public function getIdImdb(): ?string
     {
         return $this->id_imdb;
     }
 
-    public function setIdImdb(?int $id_imdb): self
+    public function setIdImdb(?string $id_imdb): self
     {
         $this->id_imdb = $id_imdb;
 
@@ -353,12 +353,12 @@ class Show
         return $this;
     }
 
-    public function getApiUpdate(): ?\DateTimeInterface
+    public function getApiUpdate(): ?int
     {
         return $this->apiUpdate;
     }
 
-    public function setApiUpdate(?\DateTimeInterface $apiUpdate): self
+    public function setApiUpdate(?int $apiUpdate): self
     {
         $this->apiUpdate = $apiUpdate;
 

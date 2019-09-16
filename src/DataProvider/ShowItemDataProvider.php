@@ -29,7 +29,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
 
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        $show = $this->repository->find($id);
+        $show = $this->repository->findOneBy(['id_tvmaze' => $id]);
 
         if ($show === null) {
             $showApi = ApiController::retrieveData('get', 'showFull', $id);
@@ -68,6 +68,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                 'name' => $name,
                 'summary' => $summary,
                 'status' => 0,
+                'premiered' => $showApi->premiered,
                 'poster' => $poster,
                 'website' => $website,
                 'rating' => $rating,

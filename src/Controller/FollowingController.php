@@ -12,6 +12,7 @@ use App\Entity\Network;
 use App\Entity\Following;
 use App\Repository\ShowRepository;
 use App\Repository\TypeRepository;
+use App\Repository\UserRepository;
 use App\Repository\GenreRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\EpisodeRepository;
@@ -19,7 +20,6 @@ use App\Repository\NetworkRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -31,12 +31,12 @@ class FollowingController extends AbstractController
     /**
      * @Route("/following/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
      */
-    public function new(User $user, $status, $showId, $seasonNumber, $episodeNumber, Request $request, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
+    public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
-        $show = $showRepository->findOneByIdTvmaze($showId);
+        $show = $showRepository->findOneBy(['id_tvmaze' => $showId]);
 
-        if ($show === null) {
-            $showApi = ApiController::retrieveData('get', 'show', $id);
+        if (is_null($show)) {
+            $showApi = ApiController::retrieveData('get', 'showComplete', $showId);
         
             $show = new Show();
             
@@ -47,70 +47,105 @@ class FollowingController extends AbstractController
             $show->setRating($showApi->rating->average);
             $show->setLanguage($showApi->language);
             $show->setRuntime($showApi->runtime);
-            $show->setIdTvmaze($id);
+            $show->setIdTvmaze($showId);
             $show->setIdTvdb($showApi->externals->thetvdb);
             $show->setIdImdb($showApi->externals->imdb);
             $show->setApiUpdate($showApi->updated);
 
+            $show->setStatus(0);
+
+            switch ($showApi->status) {
+                case 'Running':
+                    $show->setStatus(1);
+                    break;
+
+                case 'Ended':
+                    $show->setStatus(0);
+                    break;
+            }
+
             $type = $typeRepository->findOneByName($showApi->type);
-            if ($type === null) {
+            if (is_null($type)) {
                 $type = new Type();
                 $type->setName($showApi->type);
                 $em->persist($type);
+
+                $show->setType($type);
             } else $show->setType($type);
 
             $network = $networkRepository->findOneByName($showApi->network->name);
-            if ($network === null) {
+            if (is_null($network)) {
                 $network = new Network();
                 $network->setName($showApi->network->name);
                 $em->persist($network);
+
+                $show->setNetwork($network);
             } else $show->setNetwork($network);
 
             foreach ($showApi->genres as $currentGenre) {
-                $genre = $genreRepository->findOneByName($currrentGenre);
+                $genre = $genreRepository->findOneByName($currentGenre);
 
-                if ($genre === null) {
+                if (is_null($genre)) {
                     $genre = new Genre();
                     $genre->setName($currentGenre);
                     $em->persist($genre);
+
                     $show->addGenre($genre);
                 } else $show->addGenre($genre);
             }
 
             $em->persist($show);
 
-            $seasonNumber = 1;
+            $seasonIndex = 1;
             foreach ($showApi->_embedded->seasons as $currentSeason) {
                 $season = new Season();
 
                 $season->setNumber($currentSeason->number);
-                $season->setPoster($currentSeason->image->original);
-                $season->setEpisodeCount($currentSeason->episodeOrder);
-                $season->setPremiereDate($currentSeason->premiereDate);
-                $season->setEndDate($currentSeason->endDate);
+
+                $seasonPoster = '';
+                if (!is_null($currentSeason->image)) $seasonPoster = $currentSeason->image->original;
+                $season->setPoster($seasonPoster);
+
+                $seasonEpisodeCount = 0;
+                if (!is_null($currentSeason->episodeOrder)) $seasonEpisodeCount = $currentSeason->episodeOrder;
+                $season->setEpisodeCount($seasonEpisodeCount);
+
+                $seasonStartDate = new \DateTime($currentSeason->premiereDate);
+                $season->setPremiereDate($seasonStartDate);
+
+                $seasonEndDate = new \DateTime($currentSeason->endDate);
+                $season->setEndDate($seasonEndDate);
+
                 $season->setTvShow($show);
 
-                $episodes = new ArrayCollection();
+                $em->persist($season);
 
                 foreach ($showApi->_embedded->episodes as $currentEpisode) {
-                    if ($currentEpisode->season == $seasonNumber) {
+                    if ($currentEpisode->season == $seasonIndex) {
                         $episode = new Episode();
 
                         $episode->setName($currentEpisode->name);
                         $episode->setNumber($currentEpisode->number);
                         $episode->setRuntime($currentEpisode->runtime);
-                        $episode->setSummary($currentEpisode->summary);
-                        $episode->setAirstamp($currentEpisode->airstamp);
-                        $episode->setImage($currentEpisode->image->original);
+
+                        $episodeSummary = '';
+                        if (!is_null($currentEpisode->summary)) $episodeSummary = $currentEpisode->summary;
+                        $episode->setSummary($episodeSummary);
+
+                        $episodeAirstamp = new \DateTime($currentEpisode->airstamp);
+                        $episode->setAirstamp($episodeAirstamp);
+
+                        $episodeImage = '';
+                        if (!is_null($currentEpisode->image)) $episodeImage = $currentEpisode->image->original;
+                        $episode->setImage($episodeImage);
+
                         $episode->setSeason($season);
 
                         $em->persist($episode);
                     }
                 }
 
-                $em->persist($season);
-
-                $seasonNumber++;
+                $seasonIndex++;
             }
 
             $em->flush();
@@ -120,13 +155,17 @@ class FollowingController extends AbstractController
 
         $following->setStartDate(new \DateTime());
         $following->setStatus($status);
+
+        $user = $userRepository->find($id);
         $following->setUser($user);
+
         $following->setTvShow($show);
 
-        $season = $seasonRepository->findSeasonByShow($show, $seasonNumber);
-        $following->setSeason($season);
+        $seasonFollow = $seasonRepository->findSeasonByShow($show, $seasonNumber);
+        $following->setSeason($seasonFollow);
         
-        $following->setEpisode($episodeRepository->findEpisode($show, $season, $episodeNumber));
+        $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $episodeNumber);
+        $following->setEpisode($episodeFollow);
 
         $em->persist($following);
         $em->flush();

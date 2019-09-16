@@ -68,7 +68,7 @@ class Episode
      * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="episodes")
      * @Groups("get_episodes")
      */
-    private $Season;
+    private $season;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="episode")
@@ -157,14 +157,14 @@ class Episode
         return $this;
     }
 
-    public function getSeason(): ?Season
+    public function getSeason(): ?season
     {
-        return $this->Season;
+        return $this->season;
     }
 
-    public function setSeason(?Season $Season): self
+    public function setSeason(?Season $season): self
     {
-        $this->Season = $Season;
+        $this->season = $season;
 
         return $this;
     }
