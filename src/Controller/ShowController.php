@@ -106,7 +106,7 @@ class ShowController extends AbstractController
 
         foreach ($episodesApi as $response) {
             $showDb = null;
-            $showDb = $showRepository->findOneBy(['id_tvmaze', $reponse->show->id]);
+            $showDb = $showRepository->findOneBy(['id_tvmaze' => $response->show->id]);
 
             $status = self::STATUS_ENDED;
 
@@ -122,10 +122,14 @@ class ShowController extends AbstractController
 
             $type = '';
             $genre = null;
+            $rating = null;
+            $language = '';
 
             if (!is_null($showDb)) {
                 $type = $showDb->getType();
                 $genre = $showDb->getGenre();
+                $rating = $showDb->getRating();
+                $language = $showDb->getLanguage();
             }
 
             $poster = '';
@@ -135,11 +139,16 @@ class ShowController extends AbstractController
 
             if (is_null($genre) && !is_null($response->show->genres)) $genre = $response->show->genres;
 
+            if (!is_null($rating) && !is_null($response->show->rating)) $rating = $response->show->rating->average;
+            if ($language == '' && !is_null($response->show->language)) $language = $response->show->language;
+
             $episodes[] = array(
                 'show_name' => $response->show->name,
                 'show_status' => $status,
                 'Show_type' => $type,
-                'show_genre' => $genres,
+                'show_genre' => $genre,
+                'show_rating' => $rating,
+                'show_language' => $language,
                 'name' => $response->name,
                 'season' => $response->season,
                 'number' => $response->number,
