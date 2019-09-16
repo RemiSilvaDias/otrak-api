@@ -28,8 +28,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class FollowingController extends AbstractController
 {
+    public const STATUS_IN_DEVELOPMENT = 0;
+    public const STATUS_RUNNING = 1;
+    public const STATUS_ENDED = 2;
+
     /**
-     * @Route("/following/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
+     * @Route("/followings/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
      */
     public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
@@ -52,15 +56,15 @@ class FollowingController extends AbstractController
             $show->setIdImdb($showApi->externals->imdb);
             $show->setApiUpdate($showApi->updated);
 
-            $show->setStatus(0);
+            $show->setStatus(self::STATUS_ENDED);
 
             switch ($showApi->status) {
-                case 'Running':
-                    $show->setStatus(1);
+                case 'In Development':
+                    $show->setStatus(self::STATUS_IN_DEVELOPMENT);
                     break;
 
-                case 'Ended':
-                    $show->setStatus(0);
+                case 'Running':
+                    $show->setStatus(self::STATUS_RUNNING);
                     break;
             }
 
