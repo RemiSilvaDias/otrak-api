@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ApiResource(
  *   collectionOperations={"get"},
  *     itemOperations={
- *       "get"={"access_control"="is_granted('ROLE_USER')"},
+ *       "get",
  *        "put"
  *      }
  *    )
