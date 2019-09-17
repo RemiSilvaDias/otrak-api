@@ -28,8 +28,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class FollowingController extends AbstractController
 {
+    public const STATUS_IN_DEVELOPMENT = 0;
+    public const STATUS_RUNNING = 1;
+    public const STATUS_ENDED = 2;
+
     /**
-     * @Route("/following/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
+     * @Route("/followings/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
      */
     public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
@@ -52,15 +56,15 @@ class FollowingController extends AbstractController
             $show->setIdImdb($showApi->externals->imdb);
             $show->setApiUpdate($showApi->updated);
 
-            $show->setStatus(0);
+            $show->setStatus(self::STATUS_ENDED);
 
             switch ($showApi->status) {
-                case 'Running':
-                    $show->setStatus(1);
+                case 'In Development':
+                    $show->setStatus(self::STATUS_IN_DEVELOPMENT);
                     break;
 
-                case 'Ended':
-                    $show->setStatus(0);
+                case 'Running':
+                    $show->setStatus(self::STATUS_RUNNING);
                     break;
             }
 
@@ -73,14 +77,26 @@ class FollowingController extends AbstractController
                 $show->setType($type);
             } else $show->setType($type);
 
-            $network = $networkRepository->findOneByName($showApi->network->name);
-            if (is_null($network)) {
-                $network = new Network();
-                $network->setName($showApi->network->name);
-                $em->persist($network);
+            $network = null;
+            if (!is_null($showApi->network)) {
+                $networkDb = $networkRepository->findOneByName($showApi->network->name);
+                if (is_null($networkDb)) {
+                    $network = new Network();
+                    $network->setName($showApi->network->name);
+                    $em->persist($network);
 
-                $show->setNetwork($network);
-            } else $show->setNetwork($network);
+                    $show->setNetwork($network);
+                } else $show->setNetwork($networkDb);
+            } else if (!is_null($showApi->webChannel)) {
+                $networkDb = $networkRepository->findOneByName($showApi->webChannel->name);
+                if (is_null($networkDb)) {
+                    $network = new Network();
+                    $network->setName($showApi->webChannel->name);
+                    $em->persist($network);
+
+                    $show->setNetwork($network);
+                } else $show->setNetwork($networkDb);
+            }
 
             foreach ($showApi->genres as $currentGenre) {
                 $genre = $genreRepository->findOneByName($currentGenre);
@@ -151,23 +167,61 @@ class FollowingController extends AbstractController
             $em->flush();
         }
 
-        $following = new Following();
-
-        $following->setStartDate(new \DateTime());
-        $following->setStatus($status);
-
         $user = $userRepository->find($id);
-        $following->setUser($user);
 
-        $following->setTvShow($show);
+        if ($seasonNumber > 1) {
+            for ($i = $seasonNumber; $i > 0; $i--) {
+                $seasonFollow = $seasonRepository->findSeasonByShow($show, $i);
 
-        $seasonFollow = $seasonRepository->findSeasonByShow($show, $seasonNumber);
-        $following->setSeason($seasonFollow);
-        
-        $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $episodeNumber);
-        $following->setEpisode($episodeFollow);
+                if ($i == $seasonNumber) {
+                    for ($j = $episodeNumber; $j > 0; $j--) {
+                        $following = new Following();
+                        
+                        $following->setUser($user);
+            
+                        $following->setStartDate(new \DateTime());
+                        $following->setStatus($status);
+            
+                        $following->setTvShow($show);
+                        
+                        $following->setSeason($seasonFollow);
 
-        $em->persist($following);
+                        $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
+                        $following->setEpisode($episodeFollow);
+                        $em->persist($following);
+                    }
+                } else {
+                    for ($j = $seasonFollow->getEpisodeCount(); $j > 0; $j--) {
+                        $following = new Following();
+                        
+                        $following->setUser($user);
+            
+                        $following->setStartDate(new \DateTime());
+                        $following->setStatus($status);
+            
+                        $following->setTvShow($show);
+                        
+                        $following->setSeason($seasonFollow);
+
+                        $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
+                        $following->setEpisode($episodeFollow);
+                        $em->persist($following);
+                    }
+                }
+            }
+        } else {
+            $following = new Following();
+                        
+            $following->setUser($user);
+
+            $following->setStartDate(new \DateTime());
+            $following->setStatus($status);
+
+            $following->setTvShow($show);
+
+            $em->persist($following);
+        }
+
         $em->flush();
 
         $jsonResponse = new JsonResponse(['response' => 'success']);

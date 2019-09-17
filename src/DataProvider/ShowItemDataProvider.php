@@ -33,7 +33,6 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
 
         if ($show === null) {
             $showApi = ApiController::retrieveData('get', 'showFull', $id);
-            dump($showApi);
 
             $name = $showApi->name;
 
@@ -45,6 +44,12 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
 
             $poster = '';
             if (!is_null($showApi->image)) $poster = $showApi->image->original;
+
+            $type = '';
+            if (!is_null($showApi->type)) $type = $showApi->type;
+
+            $genre = null;
+            if (!is_null($showApi->genres)) $genre = $showApi->genres;
 
             $website = '';
             if (!is_null($showApi->officialSite)) $website = $showApi->officialSite;
@@ -67,7 +72,9 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $show = new JsonResponse([
                 'name' => $name,
                 'summary' => $summary,
-                'status' => 0,
+                'type' => $type,
+                'genre' => $genre,
+                'status' => $status,
                 'premiered' => $showApi->premiered,
                 'poster' => $poster,
                 'website' => $website,
