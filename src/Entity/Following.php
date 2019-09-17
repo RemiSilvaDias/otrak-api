@@ -50,14 +50,12 @@ class Following
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Episode", inversedBy="followings")
      * @ApiSubresource
-     * @Assert\NotBlank
      */
     private $episode;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="followings")
      * @ApiSubresource
-     * @Assert\NotBlank
      */
     private $season;
 
