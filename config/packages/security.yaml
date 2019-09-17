@@ -15,7 +15,7 @@ security:
             security: false
         
         login:
-            pattern: ^/api/login_check
+            pattern: ^/api/login
             stateless: true
             anonymous: true
             provider: app_user_provider
