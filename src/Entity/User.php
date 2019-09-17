@@ -14,9 +14,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ApiResource(
- *      collectionOperations={"get"},
- *      itemOperations={"get", "put"}
- * )
+ *   collectionOperations={"get"},
+ *     itemOperations={
+ *       "get"={"access_control"="is_granted('ROLE_USER')"},
+ *        "put"
+ *      }
+ *    )
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity("email")
