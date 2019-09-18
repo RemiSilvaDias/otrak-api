@@ -30,6 +30,7 @@ class UserSubscriber implements EventSubscriberInterface
     public function setPassword(GetResponseForControllerResultEvent $event)
     {
         $user = $event->getControllerResult();
+        $method = $event->getRequest()->getMethod();
 
         if (!$user instanceof User) {
             return;

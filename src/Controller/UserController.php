@@ -77,11 +77,9 @@ class UserController extends AbstractController
      * @Route("/api/users/profile", methods={"GET"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function getUserInfo(FollowingRepository $followingRepository)
+    public function getUserInfo()
     {
         $user = $this->getUser();
-
-        $followings = $followingRepository->findByUser($user);
 
         return new JsonResponse([
             'id' => $user->getId(),
