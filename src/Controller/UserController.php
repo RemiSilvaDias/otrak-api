@@ -23,9 +23,19 @@ class UserController extends AbstractController
      */
     public function new(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder, RoleRepository $roleRepository, EntityManagerInterface $em)
     {
-        $username = $request->request->get('username');
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
+        $username = '';
+        $email = '';
+        $password = '';
+
+        $data = $request->getContent();
+
+        if (!empty($data)) {
+            $decodedData = \json_decode($data, true);
+
+            $username = $decodedData['username'];
+            $email = $decodedData['email'];
+            $password = $decodedData['password'];
+        }
 
         $user = $userRepository->findOneByEmail($email);
 
