@@ -47,8 +47,8 @@ class Season
     private $episodeCount;
 
     /**
-     * @ORM\Column(type="datetime")
-     * @Groups("get_seasons")
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"get_seasons", "get_following"})
      */
     private $premiereDate;
 
@@ -130,7 +130,7 @@ class Season
         return $this->premiereDate;
     }
 
-    public function setPremiereDate(\DateTimeInterface $premiereDate): self
+    public function setPremiereDate(?\DateTimeInterface $premiereDate): self
     {
         $this->premiereDate = $premiereDate;
 

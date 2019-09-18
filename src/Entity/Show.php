@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      itemOperations={
  *          "get",
  *      },
- *      normalizationContext={"groups"={"get_episodes", "get_seasons", "get_shows"}, "enable_max_depth"=true},
+ *      normalizationContext={"groups"={"get_shows"}, "enable_max_depth"=true},
  *      attributes={
  *          "force_eager"=false,
  *      }
@@ -130,7 +130,7 @@ class Show
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="shows")
-     * @Groups("get_shows")
+     * @Groups({"get_shows", "get_following"})
      */
     private $type;
 
@@ -482,7 +482,7 @@ class Show
         return $this->id_tvdb;
     }
 
-    public function setIdTvdb(int $id_tvdb): self
+    public function setIdTvdb(?int $id_tvdb): self
     {
         $this->id_tvdb = $id_tvdb;
 
