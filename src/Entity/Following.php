@@ -10,7 +10,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *      collectionOperations={"get"},
- *      itemOperations={"get", "put", "delete"}
+ *      itemOperations={"get", "put", "delete"},
+ *      attributes={"order"={"id": "DESC", "episode"}}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\FollowingRepository")
  * @ORM\HasLifecycleCallbacks()

@@ -59,7 +59,7 @@ class Season
     private $endDate;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="Season")
+     * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="season")
      * @ApiSubresource
      * @Groups("get_seasons")
      */

@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
+use App\Repository\FollowingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -67,6 +69,24 @@ class UserController extends AbstractController
             // 'username' => $user->getUsername(),
             // 'role' => $user->getRoles(),
             'user' => $user,
+        ]);
+    }
+
+    /**
+     * @Route("/api/users/profile", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function getUserInfo(FollowingRepository $followingRepository)
+    {
+        $user = $this->getUser();
+
+        $followings = $followingRepository->findByUser($user);
+
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+            'avatar' => $user->getAvatar(),
         ]);
     }
 }

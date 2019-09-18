@@ -19,19 +19,6 @@ class FollowingRepository extends ServiceEntityRepository
         parent::__construct($registry, Following::class);
     }
 
-    public function findEpisode($user, $show, $season, $episodeNumber)
-    {
-        return $this->createQueryBuilder('f')
-            ->where('f.user = :user')
-            ->andWhere('f.show = :show')
-            ->andWhere('f.season = :season')
-            ->andWhere('f.episodeNumber = :episodeNumber')
-            ->setParameters(['user' => $user, 'show' => $show, 'season' => $season, 'episodeNumber' => $episodeNumber])
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-
     // /**
     //  * @return Following[] Returns an array of Following objects
     //  */

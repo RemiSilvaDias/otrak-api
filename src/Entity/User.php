@@ -15,7 +15,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ApiResource(
  *      collectionOperations={"get"},
- *      itemOperations={"get", "put"}
+ *      itemOperations={"get", "put"},
+ *      attributes={
+ *          "force_eager"=true,
+ *      }
  * )
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()

@@ -171,12 +171,14 @@ class FollowingController extends AbstractController
         $user = $userRepository->find($id);
 
         if ($seasonNumber > 0) {
-            for ($i = $seasonNumber; $i > 0; $i--) {
+            for ($i = 1; $i <= $seasonNumber; $i++) {
                 $seasonFollow = $seasonRepository->findSeasonByShow($show, $i);
 
                 if ($i == $seasonNumber) {
-                    for ($j = $episodeNumber; $j > 0; $j--) {
-                        $checkEpisodeTrackingStatus = $followingRepository->findEpisode($user, $show, $seasonFollow, $j);
+                    for ($j = 0; $j <= $episodeNumber; $j++) {
+                        $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonFollow, 'episode' => $j]);
+
+                        $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
 
                         if ($episodeFollow->getAirstamp() < new \DateTime() && is_null($checkEpisodeTrackingStatus)) {
                             $following = new Following();
@@ -190,14 +192,15 @@ class FollowingController extends AbstractController
                             
                             $following->setSeason($seasonFollow);
                             
-                            $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
                             $following->setEpisode($episodeFollow);
                             $em->persist($following);
                         }
                     }
                 } else {
-                    for ($j = $seasonFollow->getEpisodeCount(); $j > 0; $j--) {
-                        $checkEpisodeTrackingStatus = $followingRepository->findEpisode($user, $show, $seasonFollow, $j);
+                    for ($j = 1; $j <= $seasonFollow->getEpisodeCount(); $j++) {
+                        $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonFollow, 'episode' => $j]);
+
+                        $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
 
                         if ($episodeFollow->getAirstamp() < new \DateTime() && is_null($checkEpisodeTrackingStatus)) {
                             $following = new Following();
@@ -211,16 +214,19 @@ class FollowingController extends AbstractController
                             
                             $following->setSeason($seasonFollow);
                             
-                            $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
                             $following->setEpisode($episodeFollow);
                             $em->persist($following);
                         }
                     }
                 }
             }
-        } else {
+        }
+
+        $checkShowTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
+
+        if (is_null($checkShowTrackingStatus)) {
             $following = new Following();
-                        
+                    
             $following->setUser($user);
 
             $following->setStartDate(new \DateTime());
