@@ -24,13 +24,13 @@ class Season
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons"})
+     * @Groups({"get_episodes", "get_seasons", "get_following"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons"})
+     * @Groups({"get_episodes", "get_seasons", "get_following"})
      */
     private $number;
 
@@ -59,7 +59,7 @@ class Season
     private $endDate;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="Season")
+     * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="season")
      * @ApiSubresource
      * @Groups("get_seasons")
      */

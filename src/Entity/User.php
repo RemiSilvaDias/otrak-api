@@ -15,7 +15,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ApiResource(
  *      collectionOperations={"get"},
- *      itemOperations={"get", "put"}
+ *      itemOperations={"get", "put"},
+ *      attributes={
+ *          "force_eager"=true,
+ *      }
  * )
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -74,6 +77,11 @@ class User implements UserInterface, \Serializable
      * @ApiSubresource
      */
     private $followings;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $plainPassword;
 
     public function __construct()
     {
@@ -238,7 +246,7 @@ class User implements UserInterface, \Serializable
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
     /** @see \Serializable::serialize() */
     public function serialize()
@@ -261,5 +269,19 @@ class User implements UserInterface, \Serializable
             // see section on salt below
             // $this->salt
         ) = unserialize($serialized, ['allowed_classes' => false]);
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        $this->password = null;
+
+        return $this;
     }
 }

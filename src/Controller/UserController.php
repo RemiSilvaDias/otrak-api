@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
+use App\Repository\FollowingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -38,8 +40,7 @@ class UserController extends AbstractController
         $user->setUsername($username);
         $user->setEmail($email);
 
-        $encoded = $encoder->encodePassword($user, $password);
-        $user->setPassword($encoded);
+        $user->setPlainPassword($password);
 
         $user->setCreatedAt(new \DateTime());
 
@@ -58,15 +59,33 @@ class UserController extends AbstractController
      * User login route
      * 
      * @Route("/api/login", name="login", methods={"POST"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function login(Request $request)
     {
         $user = $this->getUser();
 
         return new JsonResponse([
-            // 'username' => $user->getUsername(),
-            // 'role' => $user->getRoles(),
-            'user' => $user,
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+            'avatar' => $user->getAvatar(),
+        ]);
+    }
+
+    /**
+     * @Route("/api/users/profile", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function getUserInfo()
+    {
+        $user = $this->getUser();
+
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+            'avatar' => $user->getAvatar(),
         ]);
     }
 }
