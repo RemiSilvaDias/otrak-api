@@ -5,13 +5,15 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
  *      collectionOperations={"get"},
  *      itemOperations={"get", "put", "delete"},
- *      attributes={"order"={"id": "DESC", "episode"}}
+ *      attributes={"order"={"id": "DESC", "episode"}, "force_eager"=false},
+ *      normalizationContext={"groups"={"get_following"}, "enable_max_depth"=true}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\FollowingRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -22,23 +24,27 @@ class Following
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups("get_following")
      */
     private $id;
 
     /**
      * @ORM\Column(type="datetime")
      * @Assert\NotBlank
+     * @Groups("get_following")
      */
     private $startDate;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("get_following")
      */
     private $endDate;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank
+     * @Groups("get_following")
      */
     private $status;
 
@@ -51,12 +57,14 @@ class Following
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Episode", inversedBy="followings")
      * @ApiSubresource
+     * @Groups("get_following")
      */
     private $episode;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="followings")
      * @ApiSubresource
+     * @Groups("get_following")
      */
     private $season;
 
@@ -64,6 +72,7 @@ class Following
      * @ORM\ManyToOne(targetEntity="App\Entity\Show", inversedBy="followings")
      * @ApiSubresource
      * @Assert\NotBlank
+     * @Groups("get_following")
      */
     private $tvShow;
 

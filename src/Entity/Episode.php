@@ -24,19 +24,19 @@ class Episode
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("get_episodes")
+     * @Groups({"get_episodes", "get_following"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("get_episodes")
+     * @Groups({"get_episodes", "get_following"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups("get_episodes")
+     * @Groups({"get_episodes", "get_following"})
      */
     private $number;
 
@@ -54,13 +54,13 @@ class Episode
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups("get_episodes")
+     * @Groups({"get_episodes", "get_following"})
      */
     private $airstamp;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("get_episodes")
+     * @Groups({"get_episodes", "get_following"})
      */
     private $image;
 
