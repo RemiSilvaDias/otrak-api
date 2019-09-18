@@ -40,8 +40,7 @@ class UserController extends AbstractController
         $user->setUsername($username);
         $user->setEmail($email);
 
-        $encoded = $encoder->encodePassword($user, $password);
-        $user->setPassword($encoded);
+        $user->setPlainPassword($password);
 
         $user->setCreatedAt(new \DateTime());
 
@@ -60,15 +59,17 @@ class UserController extends AbstractController
      * User login route
      * 
      * @Route("/api/login", name="login", methods={"POST"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function login(Request $request)
     {
         $user = $this->getUser();
 
         return new JsonResponse([
-            // 'username' => $user->getUsername(),
-            // 'role' => $user->getRoles(),
-            'user' => $user,
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+            'avatar' => $user->getAvatar(),
         ]);
     }
 

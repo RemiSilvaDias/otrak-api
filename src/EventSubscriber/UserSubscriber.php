@@ -1,0 +1,47 @@
+<?php
+
+namespace App\EventSubscriber;
+
+use App\Entity\User;
+use Doctrine\ORM\Event\LifecycleEventArgs;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
+use ApiPlatform\Core\EventListener\EventPriorities;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+
+class UserSubscriber implements EventSubscriberInterface
+{
+    private $passwordEncoder;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+    }
+    
+    public static function getSubscribedEvents()
+    {
+        return [
+            KernelEvents::VIEW => ['setPassword', EventPriorities::POST_VALIDATE],
+        ];
+    }
+
+    public function setPassword(GetResponseForControllerResultEvent $event)
+    {
+        $user = $event->getControllerResult();
+
+        if (!$user instanceof User) {
+            return;
+        }
+
+        if (Request::METHOD_PUT === $method) {
+            $password = $this->passwordEncoder->encodePassword($user, $user->getPlainPassword());
+            $user->setPassword($password);
+
+            $user->setUpdatedAt(new \DateTime());
+            
+            $user->eraseCredentials();
+        }
+    }
+}
