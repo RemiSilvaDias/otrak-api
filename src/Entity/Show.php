@@ -39,7 +39,7 @@ class Show
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
      */
     private $name;
 
@@ -51,13 +51,13 @@ class Show
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
      */
     private $status;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
      */
     private $poster;
 
@@ -69,7 +69,7 @@ class Show
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
      */
     private $rating;
 
@@ -93,7 +93,7 @@ class Show
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
      * @Assert\NotBlank
      */
     private $id_tvmaze;
@@ -124,7 +124,7 @@ class Show
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Genre", inversedBy="shows")
-     * @Groups("get_shows")
+     * @Groups({"get_shows", "get_following"})
      */
     private $genre;
 
