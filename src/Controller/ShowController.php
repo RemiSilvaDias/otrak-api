@@ -5,10 +5,14 @@ namespace App\Controller;
 use App\Entity\Show;
 use App\Controller\ApiController;
 use App\Repository\ShowRepository;
+use App\Repository\SeasonRepository;
+use App\Repository\EpisodeRepository;
 use App\Repository\FollowingRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -19,6 +23,12 @@ class ShowController extends AbstractController
     public const STATUS_IN_DEVELOPMENT = 0;
     public const STATUS_RUNNING = 1;
     public const STATUS_ENDED = 2;
+
+    public const TRACKING_WATCHING = 0;
+    public const TRACKING_COMPLETED = 1;
+    public const TRACKING_SEE_NEXT = 2;
+    public const TRACKING_UPCOMING = 3;
+    public const TRACKING_STOPPED = 4;
 
     /**
      * @Route("/shows/search/{search}", methods={"GET"})
@@ -110,13 +120,13 @@ class ShowController extends AbstractController
         $user = $this->getUser();
 
         if (!is_null($user)) {
-            $followingListUser = $followingRepository->findByUser($user);
+            $followingListUser = $followingRepository->findBy(['user' => $user], ['id' => 'DESC']);
 
             foreach ($episodesApi as $key => $value) {
                 $found = false;
                 
                 foreach($followingListUser as $following) {
-                    if ($following->getTvShow()->getIdTvmaze() == $value->show->id) $found = !$found;
+                    if (!is_null($following->getEpisode()) && $following->getTvShow()->getIdTvmaze() == $value->show->id && ($following->getSeason()->getNumber() == $value->season && $following->getEpisode()->getNumber() == $value->number - 1)) $found = !$found;
                 }
 
                 if (!$found) unset($episodesApi[$key]);
@@ -181,6 +191,69 @@ class ShowController extends AbstractController
         }
 
         $jsonResponse = new JsonResponse($episodes);
+        
+        return $jsonResponse;
+    }
+
+    /**
+     * @Route("/shows/next", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function next(ShowRepository $showRepository, EpisodeRepository $episodeRepository, SeasonRepository $seasonRepository, FollowingRepository $followingRepository)
+    {
+        $nextEpisodes = [];
+        $episodes = [];
+        
+        $user = $this->getUser();
+
+        $followings = $followingRepository->findBy(['user' => $user], ['episode' => 'DESC']);
+
+        $lastShowIndex = 0;
+
+        foreach ($followings as $following) {
+            $currentDatetime = new \DateTime();
+
+            if ($following->getStatus() == self::TRACKING_COMPLETED && !is_null($following->getEpisode()) && $lastShowIndex != $following->getTvShow()->getId()) {
+                $nextEpisodeId = $following->getEpisode()->getId() + 1;
+                $nextEpisode = $episodeRepository->find($nextEpisodeId);
+
+                if(!is_null($nextEpisode) && $nextEpisode->getSeason()->getTvShow() != $following->getTvShow()) {
+                    $nextSeason = $seasonRepository->findOneBy(['tvShow' => $following->getTvShow(), 'number' => $following->getSeason()->getNumber() + 1]);
+
+                    if (!is_null($nextSeason) || $nextSeason != false) {
+                        $nextEpisode = $nextSeason->getEpisodes()->first();
+                    }
+                }
+
+                if ((!is_null($nextEpisode) || $nextEpisode != false) && $following->getEpisode()->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
+                    $episodes[] = $nextEpisode;
+
+                    $lastShowIndex = $following->getTvShow()->getId();
+                }
+            }
+        }
+
+        foreach ($episodes as $response) {
+            if (!is_bool($response)) {
+                $nextEpisodes[] = array(
+                    'show_name' => $response->getSeason()->getTvShow()->getName(),
+                    'show_status' => $response->getSeason()->getTvShow()->getStatus(),
+                    'Show_type' => $response->getSeason()->getTvShow()->getType(),
+                    'show_genre' => $response->getSeason()->getTvShow()->getGenre(),
+                    'show_rating' => $response->getSeason()->getTvShow()->getRating(),
+                    'show_language' => $response->getSeason()->getTvShow()->getLanguage(),
+                    'name' => $response->getName(),
+                    'season' => $response->getSeason()->getNumber(),
+                    'number' => $response->getNumber(),
+                    'poster' => $response->getSeason()->getTvShow()->getPoster(),
+                    'show_id_tvmaze' => $response->getSeason()->getTvShow()->getIdTvmaze(),
+                    'id_tvmaze' => $response->getId(),
+                    'airstamp' => $response->getAirstamp(),
+                );
+            }
+        }
+
+        $jsonResponse = new JsonResponse($nextEpisodes);
         
         return $jsonResponse;
     }
