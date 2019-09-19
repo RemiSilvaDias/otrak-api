@@ -36,7 +36,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
         $show = $this->repository->findOneBy(['id_tvmaze' => $id]);
 
         if ($show === null) {
-            $showApi = ApiController::retrieveData('get', 'showFull', $id);
+            $showApi = ApiController::retrieveData('get', 'showComplete', $id);
 
             $name = $showApi->name;
 
@@ -71,7 +71,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             if (!is_null($showApi->officialSite)) $website = $showApi->officialSite;
 
             $rating = 0;
-            if (!is_null($showApi->rating->average)) $rating = $showApi->rating->average;
+            if (!is_null($showApi->rating)) $rating = $showApi->rating->average;
 
             $language = '';
             if (!is_null($showApi->language)) $language = $showApi->language;
@@ -85,6 +85,18 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $premiered = null;
             if (!is_null($showApi->premiered)) $idTvDb = $showApi->premiered;
 
+            $network = null;
+            if (!is_null($showApi->network)) $network = $showApi->network->name;
+            else if (is_null($showApi->network) && !is_null($showApi->webChannel)) $network = $showApi->webChannel->name;
+
+            $nbSeasons = 0;
+            $nbEpisodes = 0;
+
+            if (sizeof($showApi->_embedded->seasons) > 0) {
+                $nbSeasons += \sizeof($showApi->_embedded->seasons);
+                $nbEpisodes += \sizeof($showApi->_embedded->episodes);
+            }
+
             $cast = null;
             if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
 
@@ -97,12 +109,15 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                 'premiered' => $premiered,
                 'poster' => $poster,
                 'website' => $website,
+                'network' => $network,
                 'rating' => $rating,
                 'language' => $language,
                 'runtime' => $runtime,
                 'id_tvmaze' => $showApi->id,
                 'id_tvdb' => $idTvDb,
                 'api_update' => $showApi->updated,
+                'nbSeasons' => $nbSeasons,
+                'nbEpisodes' => $nbEpisodes,
                 'cast' => $cast,
             ]);
 

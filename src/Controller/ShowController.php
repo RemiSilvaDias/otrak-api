@@ -153,7 +153,7 @@ class ShowController extends AbstractController
 
             $type = '';
             $genre = null;
-            $rating = null;
+            $rating = 0;
             $language = '';
 
             if (!is_null($showDb)) {
@@ -170,7 +170,7 @@ class ShowController extends AbstractController
 
             if (is_null($genre) && !is_null($response->show->genres)) $genre = $response->show->genres;
 
-            if (is_null($rating) && !is_null($response->show->rating)) $rating = $response->show->rating->average;
+            if ($rating == 0 && !is_null($response->show->rating)) $rating = $response->show->rating->average;
             if ($language == '' && !is_null($response->show->language)) $language = $response->show->language;
 
             $episodes[] = array(
@@ -211,8 +211,6 @@ class ShowController extends AbstractController
         $lastShowIndex = 0;
 
         foreach ($followings as $following) {
-            $currentDatetime = new \DateTime();
-
             if ($following->getStatus() == self::TRACKING_COMPLETED && !is_null($following->getEpisode()) && $lastShowIndex != $following->getTvShow()->getId()) {
                 $nextEpisodeId = $following->getEpisode()->getId() + 1;
                 $nextEpisode = $episodeRepository->find($nextEpisodeId);
@@ -224,6 +222,8 @@ class ShowController extends AbstractController
                         $nextEpisode = $nextSeason->getEpisodes()->first();
                     }
                 }
+                
+                $currentDatetime = new \DateTime();
 
                 if ((!is_null($nextEpisode) && !is_bool($nextEpisode)) && $nextEpisode->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
                     $episodes[] = $nextEpisode;

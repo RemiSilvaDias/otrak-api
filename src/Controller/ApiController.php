@@ -43,7 +43,7 @@ class ApiController extends AbstractController
                 $endpoint = "http://api.tvmaze.com/shows/".$id."?embed=cast";
                 break;
                 case 'showComplete':
-                $endpoint = "http://api.tvmaze.com/shows/".$id."?embed[]=seasons&embed[]=episodes";
+                $endpoint = "http://api.tvmaze.com/shows/".$id."?embed[]=seasons&embed[]=episodes&embed[]=cast";
                 break;
                 case 'season':
                 $endpoint = "http://api.tvmaze.com/shows/".$id."/seasons";
