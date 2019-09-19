@@ -225,7 +225,7 @@ class ShowController extends AbstractController
                     }
                 }
 
-                if ((!is_null($nextEpisode) && !is_bool($nextEpisode)) && $following->getEpisode()->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
+                if ((!is_null($nextEpisode) && !is_bool($nextEpisode)) && $nextEpisode->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
                     $episodes[] = $nextEpisode;
 
                     $lastShowIndex = $following->getTvShow()->getId();

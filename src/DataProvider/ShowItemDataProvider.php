@@ -12,6 +12,10 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 final class ShowItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    public const STATUS_IN_DEVELOPMENT = 0;
+    public const STATUS_RUNNING = 1;
+    public const STATUS_ENDED = 2;
+
     /**
      * @var ShowRepository
      */
@@ -40,7 +44,19 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             if (!is_null($showApi->summary)) $summary = $showApi->summary;
 
             $status = 0;
-            if (!is_null($showApi->status)) $status = $showApi->status;
+            if (!is_null($showApi->status)) {
+                $status = self::STATUS_ENDED;
+
+                switch ($showApi->status) {
+                    case 'In Development':
+                        $status = self::STATUS_IN_DEVELOPMENT;
+                        break;
+
+                    case 'Running':
+                        $status = self::STATUS_RUNNING;
+                        break;
+                }
+            }
 
             $poster = '';
             if (!is_null($showApi->image)) $poster = $showApi->image->original;
@@ -54,7 +70,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $website = '';
             if (!is_null($showApi->officialSite)) $website = $showApi->officialSite;
 
-            $rating = null;
+            $rating = 0;
             if (!is_null($showApi->rating->average)) $rating = $showApi->rating->average;
 
             $language = '';
@@ -66,6 +82,9 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $idTvDb = null;
             if (!is_null($showApi->externals->thetvdb)) $idTvDb = $showApi->externals->thetvdb;
 
+            $premiered = null;
+            if (!is_null($showApi->premiered)) $idTvDb = $showApi->premiered;
+
             $cast = null;
             if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
 
@@ -75,7 +94,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                 'type' => $type,
                 'genre' => $genre,
                 'status' => $status,
-                'premiered' => $showApi->premiered,
+                'premiered' => $premiered,
                 'poster' => $poster,
                 'website' => $website,
                 'rating' => $rating,

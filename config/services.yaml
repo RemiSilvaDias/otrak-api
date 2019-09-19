@@ -36,3 +36,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
+
+    App\Serializer\ApiNormalizer:
+        decorates: 'api_platform.jsonld.normalizer.item'
+        arguments: [ '@App\Serializer\ApiNormalizer.inner' ]
