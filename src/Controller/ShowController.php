@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Show;
 use App\Controller\ApiController;
 use App\Repository\ShowRepository;
+use App\Repository\FollowingRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -84,7 +85,7 @@ class ShowController extends AbstractController
     /**
      * @Route("/shows/aired", methods={"GET"})
      */
-    public function aired(ShowRepository $showRepository)
+    public function aired(ShowRepository $showRepository, FollowingRepository $followingRepository)
     {
         $episodesApi = [];
         $episodes = [];
@@ -103,6 +104,26 @@ class ShowController extends AbstractController
         \usort($episodesApi, function($item1, $item2) {
             return $item2->airstamp <=> $item1->airstamp;
         });
+
+        $episodesApiBackup = $episodesApi;
+
+        $user = $this->getUser();
+
+        if (!is_null($user)) {
+            $followingListUser = $followingRepository->findByUser($user);
+
+            foreach ($episodesApi as $key => $value) {
+                $found = false;
+                
+                foreach($followingListUser as $following) {
+                    if ($following->getTvShow()->getIdTvmaze() == $value->show->id) $found = !$found;
+                }
+
+                if (!$found) unset($episodesApi[$key]);
+            }
+        }
+
+        if (empty($episodesApi)) $episodesApi = $episodesApiBackup;
 
         foreach ($episodesApi as $response) {
             $showDb = null;
