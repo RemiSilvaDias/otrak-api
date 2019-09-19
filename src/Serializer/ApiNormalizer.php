@@ -48,9 +48,9 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
                     }
                 }
 
-                $data['cast'] = $cast;
                 $data['nbSeasons'] = $nbSeasons;
                 $data['nbEpisodes'] = $nbEpisodes;
+                $data['cast'] = $cast;
             }
         }
 
