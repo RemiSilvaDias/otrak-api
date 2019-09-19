@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *      collectionOperations={"get"},
  *      itemOperations={"get", "put", "delete"},
- *      attributes={"order"={"id": "DESC", "episode"}, "force_eager"=false},
+ *      attributes={"order"={"id": "DESC", "episode"}, "force_eager"=true},
  *      normalizationContext={"groups"={"get_following"}, "enable_max_depth"=true}
  * )
  * @ORM\Entity(repositoryClass="App\Repository\FollowingRepository")
