@@ -26,7 +26,7 @@ class UserController extends AbstractController
         $username = '';
         $email = '';
         $password = '';
-        
+
         $data = $request->getContent();
 
         if (!empty($data)) {
