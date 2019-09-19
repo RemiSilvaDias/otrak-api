@@ -124,13 +124,13 @@ class Show
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Genre", inversedBy="shows")
-     * @Groups({"get_shows", "get_following"})
+     * @Groups({"get_shows", "get_seasons", "get_following"})
      */
     private $genre;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="shows")
-     * @Groups({"get_shows", "get_following"})
+     * @Groups({"get_shows", "get_seasons", "get_following"})
      */
     private $type;
 

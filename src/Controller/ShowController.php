@@ -220,12 +220,12 @@ class ShowController extends AbstractController
                 if(!is_null($nextEpisode) && $nextEpisode->getSeason()->getTvShow() != $following->getTvShow()) {
                     $nextSeason = $seasonRepository->findOneBy(['tvShow' => $following->getTvShow(), 'number' => $following->getSeason()->getNumber() + 1]);
 
-                    if (!is_null($nextSeason) || $nextSeason != false) {
+                    if (!is_null($nextSeason) && !is_bool($nextSeason)) {
                         $nextEpisode = $nextSeason->getEpisodes()->first();
                     }
                 }
 
-                if ((!is_null($nextEpisode) || $nextEpisode != false) && $following->getEpisode()->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
+                if ((!is_null($nextEpisode) && !is_bool($nextEpisode)) && $following->getEpisode()->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
                     $episodes[] = $nextEpisode;
 
                     $lastShowIndex = $following->getTvShow()->getId();
