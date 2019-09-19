@@ -238,7 +238,7 @@ class ShowController extends AbstractController
                 $nextEpisodes[] = array(
                     'show_name' => $response->getSeason()->getTvShow()->getName(),
                     'show_status' => $response->getSeason()->getTvShow()->getStatus(),
-                    'Show_type' => $response->getSeason()->getTvShow()->getType(),
+                    'Show_type' => $response->getSeason()->getTvShow()->getType()->getName(),
                     'show_genre' => $response->getSeason()->getTvShow()->getGenre(),
                     'show_rating' => $response->getSeason()->getTvShow()->getRating(),
                     'show_language' => $response->getSeason()->getTvShow()->getLanguage(),

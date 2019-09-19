@@ -40,7 +40,7 @@ class FollowingController extends AbstractController
     public const TRACKING_STOPPED = 4;
 
     /**
-     * @Route("/followings/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"GET"})
+     * @Route("/followings/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
      */
     public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
@@ -225,66 +225,43 @@ class FollowingController extends AbstractController
         }
 
         if ($seasonNumber > 0) {
-            // for ($i = 1; $i <= $seasonNumber; $i++) {
             foreach ($show->getSeasons() as $seasonShow) {
-                // $seasonFollow = $seasonRepository->findSeasonByShow($show, $i);
-
-                // if ($i == $seasonNumber) {
                 if ($seasonShow->getNumber() <= $seasonNumber) {
-                    // for ($j = 1; $j <= $episodeNumber; $j++) {
-                    foreach ($seasonShow->getEpisodes() as $episodeShow) {
-                        // $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
-
-                        // $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonFollow, 'episode' => $episodeFollow]);
-                        $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
-
-                        // if (is_null($checkEpisodeTrackingStatus) && $episodeFollow->getAirstamp() < new \DateTime()) {
-                        if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime()) {
-                            $following = new Following();
+                    if($seasonShow->getNumber() == $seasonNumber) {
+                        foreach ($seasonShow->getEpisodes() as $episodeShow) {
+                            $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
                             
-                            $following->setUser($user);
-                
-                            $following->setStartDate(new \DateTime());
-
-                            $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
-                            $following->setStatus($followingStatus);
-                
-                            $following->setTvShow($show);
-                            
-                            // $following->setSeason($seasonFollow);
-                            $following->setSeason($seasonShow);
-                            
-                            // $following->setEpisode($episodeFollow);
-                            $following->setEpisode($episodeShow);
-                            $em->persist($following);
+                            if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime() && $episodeShow->getNumber() <= $episodeNumber) {
+                                $following = new Following();
+                                
+                                $following->setUser($user);
+                                $following->setStartDate(new \DateTime());
+                                $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
+                                $following->setStatus($followingStatus);
+                                $following->setTvShow($show);
+                                $following->setSeason($seasonShow);
+                                
+                                $following->setEpisode($episodeShow);
+                                $em->persist($following);
+                            }
                         }
-                    }
-                } else {
-                    // for ($j = 1; $j <= $seasonFollow->getEpisodeCount(); $j++) {
-                    foreach ($seasonShow as $episodeShow) {
-                        // $episodeFollow = $episodeRepository->findEpisodeBySeason($seasonFollow, $j);
-
-                        // $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonFollow, 'episode' => $episodeFollow]);
-                        $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
-
-                        // if (is_null($checkEpisodeTrackingStatus) && $episodeFollow->getAirstamp() < new \DateTime()) {
-                        if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime()) {
-                            $following = new Following();
+                    } else {
+                        foreach ($seasonShow as $episodeShow) {
+                            $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
                             
-                            $following->setUser($user);
-                
-                            $following->setStartDate(new \DateTime());
+                            if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime()) {
+                                $following = new Following();
+                                
+                                $following->setUser($user);
+                                $following->setStartDate(new \DateTime());
+                                $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
+                                $following->setStatus($followingStatus);
+                                $following->setTvShow($show);
+                                $following->setSeason($seasonShow);
 
-                            $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
-                            $following->setStatus($followingStatus);
-                
-                            $following->setTvShow($show);
-                            
-                            $following->setSeason($seasonShow);
-                            
-                            // $following->setEpisode($episodeFollow);
-                            $following->setEpisode($episodeShow);
-                            $em->persist($following);
+                                $following->setEpisode($episodeShow);
+                                $em->persist($following);
+                            }
                         }
                     }
                 }
