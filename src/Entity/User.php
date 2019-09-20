@@ -16,6 +16,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ApiResource(
  *      collectionOperations={"get"},
  *      itemOperations={"get", "put"},
+ *      subresourceOperations={
+ *         "api_users_followings_get_subresource"={
+ *              "method"="GET",
+ *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object.getUser() == user"
+ *           },
+ *     },
  *      attributes={
  *          "force_eager"=true,
  *      }

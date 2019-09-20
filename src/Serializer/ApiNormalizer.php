@@ -33,10 +33,13 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
         if($object instanceof Show) {
             if (is_array($data)) {
-                $showApi = ApiController::retrieveData('get', 'showFull', $object->getIdTvmaze());
-
-                $cast = null;
-                if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
+                
+                if ($context['operation_type'] != 'subresource') {
+                    $showApi = ApiController::retrieveData('get', 'showFull', $object->getIdTvmaze());
+                    $cast = null;
+                    if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
+                    $data['cast'] = $cast;
+                }
 
                 $nbSeasons = 0;
                 $nbEpisodes = 0;
@@ -50,7 +53,6 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
                 $data['nbSeasons'] = $nbSeasons;
                 $data['nbEpisodes'] = $nbEpisodes;
-                $data['cast'] = $cast;
             }
         }
 

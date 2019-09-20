@@ -116,7 +116,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                             $episodesCount++;
 
                             $episodeImage = '';
-                            if (!is_null($episode->image)) $poster = $episode->image->original;
+                            if (!is_null($episode->image)) $episodeImage = $episode->image->original;
 
                             $episodes[] = [
                                 'name' => $episode->name,

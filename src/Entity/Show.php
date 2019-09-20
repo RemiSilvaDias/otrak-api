@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      normalizationContext={"groups"={"get_show"}, "enable_max_depth"=true},
  *      attributes={
  *          "force_eager"=false,
- *      }
+ *      },
  * )
  * 
  * @ORM\Entity(repositoryClass="App\Repository\ShowRepository")
@@ -33,7 +33,7 @@ class Show
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_show"})
+     * @Groups({"get_following", "get_episodes", "get_seasons", "get_show"})
      */
     private $id;
 

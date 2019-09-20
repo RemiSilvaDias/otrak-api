@@ -49,11 +49,13 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/api/users, roles: IS_AUTHENTICATED_ANONYMOUSLY, host: localhost }
-        - { path: ^/api/users, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
-        - { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
-        - { path: /api, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
-        - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY, methods: [GET, POST, PUT] }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/api/users/login_check, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/users/new, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: [POST] }
+        - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY, methods: [GET, PUT] }
+        - { path: ^/api/shows/next, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/followings, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/shows, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: /api, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1, host: localhost }
         - { path: /api, roles: ROLE_ADMIN }
+        # - { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY, host: localhost }
