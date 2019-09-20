@@ -38,6 +38,18 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
                 $cast = null;
                 if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
 
+                $nbSeasons = 0;
+                $nbEpisodes = 0;
+
+                if ($object->getSeasons()->count() > 0) {
+                    foreach($object->getSeasons() as $season) {
+                        $nbSeasons += 1;
+                        $nbEpisodes += $season->getEpisodes()->count();
+                    }
+                }
+
+                $data['nbSeasons'] = $nbSeasons;
+                $data['nbEpisodes'] = $nbEpisodes;
                 $data['cast'] = $cast;
             }
         }

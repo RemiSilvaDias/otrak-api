@@ -36,7 +36,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
         $show = $this->repository->findOneBy(['id_tvmaze' => $id]);
 
         if ($show === null) {
-            $showApi = ApiController::retrieveData('get', 'showFull', $id);
+            $showApi = ApiController::retrieveData('get', 'showComplete', $id);
 
             $name = $showApi->name;
 
@@ -64,14 +64,18 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $type = '';
             if (!is_null($showApi->type)) $type = $showApi->type;
 
-            $genre = null;
-            if (!is_null($showApi->genres)) $genre = $showApi->genres;
+            $genre = [];
+            if (!is_null($showApi->genres)) {
+                foreach ($showApi->genres as $currentGenre) {
+                    $genre = self::array_push_assoc($genre, 'name', $currentGenre);
+                }
+            }
 
             $website = '';
             if (!is_null($showApi->officialSite)) $website = $showApi->officialSite;
 
             $rating = 0;
-            if (!is_null($showApi->rating->average)) $rating = $showApi->rating->average;
+            if (!is_null($showApi->rating)) $rating = $showApi->rating->average;
 
             $language = '';
             if (!is_null($showApi->language)) $language = $showApi->language;
@@ -85,6 +89,56 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $premiered = null;
             if (!is_null($showApi->premiered)) $idTvDb = $showApi->premiered;
 
+            $network = null;
+            if (!is_null($showApi->network)) $network = $showApi->network->name;
+            else if (is_null($showApi->network) && !is_null($showApi->webChannel)) $network = $showApi->webChannel->name;
+
+            $nbSeasons = 0;
+            $nbEpisodes = 0;
+
+            $seasons = [];
+
+            if (sizeof($showApi->_embedded->seasons) > 0) {
+                $nbSeasons += \sizeof($showApi->_embedded->seasons);
+                $nbEpisodes += \sizeof($showApi->_embedded->episodes);
+
+                foreach ($showApi->_embedded->seasons as $season) {
+                    $episodes = [];
+
+                    $seasonPoster = '';
+                    if (!is_null($season->image)) $poster = $season->image->original;
+
+                    $episodes = [];
+                    $episodesCount = 0;
+
+                    foreach($showApi->_embedded->episodes as $episode) {
+                        if ($episode->season == $season->number) {
+                            $episodesCount++;
+
+                            $episodeImage = '';
+                            if (!is_null($episode->image)) $poster = $episode->image->original;
+
+                            $episodes[] = [
+                                'name' => $episode->name,
+                                'number' => $episode->number,
+                                'summary' => $episode->summary,
+                                'airstamp' => $episode->airstamp,
+                                'image' => $episodeImage,
+                            ];
+                        }
+                    }
+
+                    $seasons[] = [
+                        'number' => $season->number,
+                        'poster' => $seasonPoster,
+                        'episodeCount' => $season->episodeOrder,
+                        'premiereDate' => $season->premiereDate,
+                        'endDate' => $season->endDate,
+                        'episodes' => $episodes,
+                    ];
+                }
+            }
+
             $cast = null;
             if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
 
@@ -97,12 +151,16 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                 'premiered' => $premiered,
                 'poster' => $poster,
                 'website' => $website,
+                'network' => $network,
                 'rating' => $rating,
                 'language' => $language,
                 'runtime' => $runtime,
                 'id_tvmaze' => $showApi->id,
                 'id_tvdb' => $idTvDb,
                 'api_update' => $showApi->updated,
+                'nbSeasons' => $nbSeasons,
+                'nbEpisodes' => $nbEpisodes,
+                'seasons' => $seasons,
                 'cast' => $cast,
             ]);
 
@@ -110,5 +168,11 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
         }
 
         return $show;
+    }
+
+    public function array_push_assoc($array, $key, $value){
+        $array[$key] = $value;
+
+        return $array;
     }
 }

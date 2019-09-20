@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      itemOperations={
  *          "get",
  *      },
- *      normalizationContext={"groups"={"get_shows"}, "enable_max_depth"=true},
+ *      normalizationContext={"groups"={"get_show"}, "enable_max_depth"=true},
  *      attributes={
  *          "force_eager"=false,
  *      }
@@ -33,135 +33,135 @@ class Show
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_show"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
+     * @Groups({"get_episodes", "get_seasons", "get_show", "get_following"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_show"})
      */
     private $summary;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
+     * @Groups({"get_episodes", "get_seasons", "get_show", "get_following"})
      */
     private $status;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
+     * @Groups({"get_episodes", "get_seasons", "get_show", "get_following"})
      */
     private $poster;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("get_shows")
+     * @Groups("get_show")
      */
     private $website;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
+     * @Groups({"get_episodes", "get_seasons", "get_show", "get_following"})
      */
     private $rating;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("get_shows")
+     * @Groups("get_show")
      */
     private $language;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_show"})
      */
     private $slug;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups("get_shows")
+     * @Groups("get_show")
      */
     private $runtime;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_shows", "get_following"})
+     * @Groups({"get_episodes", "get_seasons", "get_show", "get_following"})
      * @Assert\NotBlank
      */
     private $id_tvmaze;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_show"})
      */
     private $id_imdb;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_show"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_show"})
      */
     private $updatedAt;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups("get_shows")
+     * @Groups("get_show")
      */
     private $apiUpdate;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Genre", inversedBy="shows")
-     * @Groups({"get_shows", "get_seasons", "get_following"})
+     * @Groups({"get_show", "get_seasons", "get_following"})
      */
     private $genre;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Type", inversedBy="shows")
-     * @Groups({"get_shows", "get_seasons", "get_following"})
+     * @Groups({"get_show", "get_seasons", "get_following"})
      */
     private $type;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Network", inversedBy="shows")
-     * @Groups("get_shows")
+     * @Groups("get_show")
      */
     private $network;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Season", mappedBy="tvShow")
      * @ApiSubresource
-     * @Groups({"get_seasons", "get_shows"})
+     * @Groups({"get_seasons", "get_show"})
      */
     private $seasons;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="tvShow")
-     * @Groups("get_shows")
+     * @Groups("get_show")
      */
     private $followings;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"get_episodes", "get_seasons", "get_shows"})
+     * @Groups({"get_episodes", "get_seasons", "get_show"})
      */
     private $id_tvdb;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("get_shows")
+     * @Groups("get_show")
      */
     private $premiered;
 

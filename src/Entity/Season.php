@@ -30,38 +30,38 @@ class Season
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_following"})
+     * @Groups({"get_show", "get_episodes", "get_seasons", "get_following"})
      */
     private $number;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"get_episodes", "get_seasons"})
+     * @Groups({"get_show", "get_episodes", "get_seasons"})
      */
     private $poster;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"get_episodes", "get_seasons"})
+     * @Groups({"get_show", "get_episodes", "get_seasons"})
      */
     private $episodeCount;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"get_seasons", "get_following"})
+     * @Groups({"get_show", "get_seasons", "get_following"})
      */
     private $premiereDate;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups("get_seasons")
+     * @Groups({"get_show", "get_seasons"})
      */
     private $endDate;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Episode", mappedBy="season")
      * @ApiSubresource
-     * @Groups("get_seasons")
+     * @Groups({"get_show", "get_seasons"})
      */
     private $episodes;
 

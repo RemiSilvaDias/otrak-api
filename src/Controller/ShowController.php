@@ -151,13 +151,15 @@ class ShowController extends AbstractController
                     break;
             }
 
+            $id = null;
             $type = '';
-            $genre = null;
-            $rating = null;
+            $genre = [];
+            $rating = 0;
             $language = '';
 
             if (!is_null($showDb)) {
-                $type = $showDb->getType();
+                $id = $showDb->getId();
+                $type = $showDb->getType()->getName();
                 $genre = $showDb->getGenre();
                 $rating = $showDb->getRating();
                 $language = $showDb->getLanguage();
@@ -168,12 +170,18 @@ class ShowController extends AbstractController
 
             if ($type == '' && !is_null($type = $response->show->type)) $type = $response->show->type;
 
-            if (is_null($genre) && !is_null($response->show->genres)) $genre = $response->show->genres;
+            if (sizeof($genre) == 0 && !is_null($response->show->genres)) {
+                foreach ($response->show->genres as $currentGenre) {
+                    $genre = self::array_push_assoc($genre, 'name', $currentGenre);
+                }
+            }
 
-            if (is_null($rating) && !is_null($response->show->rating)) $rating = $response->show->rating->average;
+            if ($rating == 0 && !is_null($response->show->rating)) $rating = $response->show->rating->average;
             if ($language == '' && !is_null($response->show->language)) $language = $response->show->language;
 
             $episodes[] = array(
+                'show_id' => $id,
+                'show_id_tvmaze' => $response->show->id,
                 'show_name' => $response->show->name,
                 'show_status' => $status,
                 'Show_type' => $type,
@@ -184,7 +192,6 @@ class ShowController extends AbstractController
                 'season' => $response->season,
                 'number' => $response->number,
                 'poster' => $poster,
-                'show_id_tvmaze' => $response->show->id,
                 'id_tvmaze' => $response->id,
                 'airstamp' => $response->airstamp,
             );
@@ -211,8 +218,6 @@ class ShowController extends AbstractController
         $lastShowIndex = 0;
 
         foreach ($followings as $following) {
-            $currentDatetime = new \DateTime();
-
             if ($following->getStatus() == self::TRACKING_COMPLETED && !is_null($following->getEpisode()) && $lastShowIndex != $following->getTvShow()->getId()) {
                 $nextEpisodeId = $following->getEpisode()->getId() + 1;
                 $nextEpisode = $episodeRepository->find($nextEpisodeId);
@@ -224,6 +229,8 @@ class ShowController extends AbstractController
                         $nextEpisode = $nextSeason->getEpisodes()->first();
                     }
                 }
+                
+                $currentDatetime = new \DateTime();
 
                 if ((!is_null($nextEpisode) && !is_bool($nextEpisode)) && $nextEpisode->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
                     $episodes[] = $nextEpisode;
@@ -236,6 +243,8 @@ class ShowController extends AbstractController
         foreach ($episodes as $response) {
             if (!is_bool($response)) {
                 $nextEpisodes[] = array(
+                    'show_id' => $response->getSeason()->getTvShow()->getId(),
+                    'show_id_tvmaze' => $response->getSeason()->getTvShow()->getIdTvmaze(),
                     'show_name' => $response->getSeason()->getTvShow()->getName(),
                     'show_status' => $response->getSeason()->getTvShow()->getStatus(),
                     'Show_type' => $response->getSeason()->getTvShow()->getType()->getName(),
@@ -246,7 +255,6 @@ class ShowController extends AbstractController
                     'season' => $response->getSeason()->getNumber(),
                     'number' => $response->getNumber(),
                     'poster' => $response->getSeason()->getTvShow()->getPoster(),
-                    'show_id_tvmaze' => $response->getSeason()->getTvShow()->getIdTvmaze(),
                     'id_tvmaze' => $response->getId(),
                     'airstamp' => $response->getAirstamp(),
                 );
@@ -256,5 +264,11 @@ class ShowController extends AbstractController
         $jsonResponse = new JsonResponse($nextEpisodes);
         
         return $jsonResponse;
+    }
+
+    public function array_push_assoc($array, $key, $value){
+        $array[$key] = $value;
+
+        return $array;
     }
 }
