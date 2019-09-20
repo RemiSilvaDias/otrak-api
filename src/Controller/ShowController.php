@@ -158,7 +158,7 @@ class ShowController extends AbstractController
             $language = '';
 
             if (!is_null($showDb)) {
-                $id = $show->getId();
+                $id = $showDb->getId();
                 $type = $showDb->getType();
                 $genre = $showDb->getGenre();
                 $rating = $showDb->getRating();
