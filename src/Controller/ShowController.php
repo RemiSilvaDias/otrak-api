@@ -151,12 +151,14 @@ class ShowController extends AbstractController
                     break;
             }
 
+            $id = null;
             $type = '';
             $genre = null;
             $rating = 0;
             $language = '';
 
             if (!is_null($showDb)) {
+                $id = $show->getId();
                 $type = $showDb->getType();
                 $genre = $showDb->getGenre();
                 $rating = $showDb->getRating();
@@ -174,6 +176,8 @@ class ShowController extends AbstractController
             if ($language == '' && !is_null($response->show->language)) $language = $response->show->language;
 
             $episodes[] = array(
+                'show_id' => $id,
+                'show_id_tvmaze' => $response->show->id,
                 'show_name' => $response->show->name,
                 'show_status' => $status,
                 'Show_type' => $type,
@@ -184,7 +188,6 @@ class ShowController extends AbstractController
                 'season' => $response->season,
                 'number' => $response->number,
                 'poster' => $poster,
-                'show_id_tvmaze' => $response->show->id,
                 'id_tvmaze' => $response->id,
                 'airstamp' => $response->airstamp,
             );
@@ -236,6 +239,8 @@ class ShowController extends AbstractController
         foreach ($episodes as $response) {
             if (!is_bool($response)) {
                 $nextEpisodes[] = array(
+                    'show_id' => $response->getSeason()->getTvShow()->getId(),
+                    'show_id_tvmaze' => $response->getSeason()->getTvShow()->getIdTvmaze(),
                     'show_name' => $response->getSeason()->getTvShow()->getName(),
                     'show_status' => $response->getSeason()->getTvShow()->getStatus(),
                     'Show_type' => $response->getSeason()->getTvShow()->getType()->getName(),
@@ -246,7 +251,6 @@ class ShowController extends AbstractController
                     'season' => $response->getSeason()->getNumber(),
                     'number' => $response->getNumber(),
                     'poster' => $response->getSeason()->getTvShow()->getPoster(),
-                    'show_id_tvmaze' => $response->getSeason()->getTvShow()->getIdTvmaze(),
                     'id_tvmaze' => $response->getId(),
                     'airstamp' => $response->getAirstamp(),
                 );

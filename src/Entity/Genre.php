@@ -23,14 +23,14 @@ class Genre
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("get_following")
+     * @Groups({"get_show", "get_following"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
-     * @Groups("get_following")
+     * @Groups({"get_show", "get_following"})
      */
     private $name;
 
