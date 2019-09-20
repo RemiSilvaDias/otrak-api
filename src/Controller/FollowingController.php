@@ -228,8 +228,6 @@ class FollowingController extends AbstractController
             $em->persist($following);
         }
 
-        dump($show);
-
         if ($seasonNumber > 0) {
             foreach ($show->getSeasons() as $seasonShow) {
                 if ($seasonShow->getNumber() <= $seasonNumber) {
