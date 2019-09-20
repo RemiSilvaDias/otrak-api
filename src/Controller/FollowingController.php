@@ -176,6 +176,8 @@ class FollowingController extends AbstractController
 
                 $em->persist($season);
 
+                $show->addSeason($season);
+
                 foreach ($showApi->_embedded->episodes as $currentEpisode) {
                     if ($currentEpisode->season == $seasonIndex) {
                         $episode = new Episode();
@@ -196,6 +198,8 @@ class FollowingController extends AbstractController
                         $episode->setImage($episodeImage);
 
                         $episode->setSeason($season);
+
+                        $season->addEpisode($episode);
 
                         $em->persist($episode);
                     }
@@ -223,6 +227,8 @@ class FollowingController extends AbstractController
 
             $em->persist($following);
         }
+
+        dump($show);
 
         if ($seasonNumber > 0) {
             foreach ($show->getSeasons() as $seasonShow) {
