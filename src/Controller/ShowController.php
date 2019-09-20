@@ -153,13 +153,13 @@ class ShowController extends AbstractController
 
             $id = null;
             $type = '';
-            $genre = null;
+            $genre = [];
             $rating = 0;
             $language = '';
 
             if (!is_null($showDb)) {
                 $id = $showDb->getId();
-                $type = $showDb->getType();
+                $type = $showDb->getType()->getName();
                 $genre = $showDb->getGenre();
                 $rating = $showDb->getRating();
                 $language = $showDb->getLanguage();
@@ -170,7 +170,11 @@ class ShowController extends AbstractController
 
             if ($type == '' && !is_null($type = $response->show->type)) $type = $response->show->type;
 
-            if (is_null($genre) && !is_null($response->show->genres)) $genre = $response->show->genres;
+            if (sizeof($genre) == 0 && !is_null($response->show->genres)) {
+                foreach ($response->show->genres as $currentGenre) {
+                    $genre = self::array_push_assoc($genre, 'name', $currentGenre);
+                }
+            }
 
             if ($rating == 0 && !is_null($response->show->rating)) $rating = $response->show->rating->average;
             if ($language == '' && !is_null($response->show->language)) $language = $response->show->language;
@@ -260,5 +264,11 @@ class ShowController extends AbstractController
         $jsonResponse = new JsonResponse($nextEpisodes);
         
         return $jsonResponse;
+    }
+
+    public function array_push_assoc($array, $key, $value){
+        $array[$key] = $value;
+
+        return $array;
     }
 }

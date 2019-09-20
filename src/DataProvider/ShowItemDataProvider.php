@@ -66,7 +66,6 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
 
             $genre = [];
             if (!is_null($showApi->genres)) {
-
                 foreach ($showApi->genres as $currentGenre) {
                     $genre = self::array_push_assoc($genre, 'name', $currentGenre);
                 }
