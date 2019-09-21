@@ -33,10 +33,11 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
         if($object instanceof Show) {
             if (is_array($data)) {
-                
                 if ($context['operation_type'] != 'subresource') {
                     $showApi = ApiController::retrieveData('get', 'showFull', $object->getIdTvmaze());
+
                     $cast = null;
+                    
                     if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
                     $data['cast'] = $cast;
                 }

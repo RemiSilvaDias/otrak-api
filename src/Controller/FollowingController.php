@@ -109,14 +109,16 @@ class FollowingController extends AbstractController
                     break;
             }
 
-            $type = $typeRepository->findOneByName($showApi->type);
-            if (is_null($type)) {
-                $type = new Type();
-                $type->setName($showApi->type);
-                $em->persist($type);
+            if (!is_null($showApi->type)) {
+                $type = $typeRepository->findOneByName($showApi->type);
+                if (is_null($type)) {
+                    $type = new Type();
+                    $type->setName($showApi->type);
+                    $em->persist($type);
 
-                $show->setType($type);
-            } else $show->setType($type);
+                    $show->setType($type);
+                } else $show->setType($type);
+            }
 
             $network = null;
             if (!is_null($showApi->network)) {
@@ -252,7 +254,7 @@ class FollowingController extends AbstractController
                             }
                         }
                     } else {
-                        foreach ($seasonShow as $episodeShow) {
+                        foreach ($seasonShow->getEpisodes() as $episodeShow) {
                             $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
                             
                             if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime()) {
