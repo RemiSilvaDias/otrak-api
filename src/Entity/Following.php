@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      itemOperations={
  *          "get"={"access_control"="object.getUser() == user"},
  *          "put"={"method"="PATCH"},
- *          "delete"
+ *          "delete"={"access_control"="object.getUser() == user"}
  *      },
  *      attributes={"order"={"id": "DESC", "episode"}, "force_eager"=true},
  *      normalizationContext={"groups"={"get_following"}, "enable_max_depth"=true}
