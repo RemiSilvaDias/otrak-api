@@ -41,7 +41,7 @@ class UserController extends AbstractController
 
         if (!is_null($user)) {
             return new JsonResponse([
-                'response' => 'error',
+                'Code' => '409',
                 'message' => 'Email already exists'
             ]);
         }
@@ -52,15 +52,16 @@ class UserController extends AbstractController
 
         $user->setPlainPassword($password);
 
-        $user->setCreatedAt(new \DateTime());
-
         $roleUser = $roleRepository->findOneByName('User');
         $user->setRole($roleUser);
 
         $em->persist($user);
         $em->flush();
 
-        $jsonResponse = new JsonResponse(['response' => 'success']);
+        $jsonResponse = new JsonResponse([
+            'Code' => 200,
+            'Message' => 'success'
+        ]);
 
         return $jsonResponse;
     }

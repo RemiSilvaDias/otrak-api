@@ -172,7 +172,7 @@ class ShowController extends AbstractController
 
             if (sizeof($genre) == 0 && !is_null($response->show->genres)) {
                 foreach ($response->show->genres as $currentGenre) {
-                    $genre = self::array_push_assoc($genre, 'name', $currentGenre);
+                    $genre[] = ['name' => $currentGenre];
                 }
             }
 
@@ -264,11 +264,5 @@ class ShowController extends AbstractController
         $jsonResponse = new JsonResponse($nextEpisodes);
         
         return $jsonResponse;
-    }
-
-    public function array_push_assoc($array, $key, $value){
-        $array[$key] = $value;
-
-        return $array;
     }
 }

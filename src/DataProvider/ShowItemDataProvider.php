@@ -3,8 +3,10 @@
 namespace App\DataProvider;
 
 use App\Entity\Show;
+use App\Entity\Genre;
 use App\Controller\ApiController;
 use App\Repository\ShowRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
@@ -67,7 +69,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $genre = [];
             if (!is_null($showApi->genres)) {
                 foreach ($showApi->genres as $currentGenre) {
-                    $genre = self::array_push_assoc($genre, 'name', $currentGenre);
+                    $genre[] = ['name' => $currentGenre];
                 }
             }
 
@@ -168,11 +170,5 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
         }
 
         return $show;
-    }
-
-    public function array_push_assoc($array, $key, $value){
-        $array[$key] = $value;
-
-        return $array;
     }
 }

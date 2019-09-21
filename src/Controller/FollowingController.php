@@ -114,6 +114,7 @@ class FollowingController extends AbstractController
                 if (is_null($type)) {
                     $type = new Type();
                     $type->setName($showApi->type);
+                    $type->addShow($show);
                     $em->persist($type);
 
                     $show->setType($type);
@@ -126,6 +127,7 @@ class FollowingController extends AbstractController
                 if (is_null($networkDb)) {
                     $network = new Network();
                     $network->setName($showApi->network->name);
+                    $network->addShow($show);
                     $em->persist($network);
 
                     $show->setNetwork($network);
@@ -135,6 +137,7 @@ class FollowingController extends AbstractController
                 if (is_null($networkDb)) {
                     $network = new Network();
                     $network->setName($showApi->webChannel->name);
+                    $network->addShow($show);
                     $em->persist($network);
 
                     $show->setNetwork($network);
@@ -147,6 +150,7 @@ class FollowingController extends AbstractController
                 if (is_null($genre)) {
                     $genre = new Genre();
                     $genre->setName($currentGenre);
+                    $genre->addShow($show);
                     $em->persist($genre);
 
                     $show->addGenre($genre);
@@ -297,7 +301,10 @@ class FollowingController extends AbstractController
             }
         }
 
-        $jsonResponse = new JsonResponse(['response' => 'success']);
+        $jsonResponse = new JsonResponse([
+            'Code' => 200,
+            'Message' => 'success'
+        ]);
         
         return $jsonResponse;
     }
