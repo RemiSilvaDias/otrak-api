@@ -44,6 +44,8 @@ class FollowingController extends AbstractController
      */
     public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
+        if ($id != $this->getUser()->getId()) throw $this->createAccessDeniedException("You can't perform this action for another user");
+
         $show = $showRepository->findOneBy(['id_tvmaze' => $showId]);
 
         if (is_null($show)) {
@@ -176,6 +178,8 @@ class FollowingController extends AbstractController
 
                 $em->persist($season);
 
+                $show->addSeason($season);
+
                 foreach ($showApi->_embedded->episodes as $currentEpisode) {
                     if ($currentEpisode->season == $seasonIndex) {
                         $episode = new Episode();
@@ -196,6 +200,8 @@ class FollowingController extends AbstractController
                         $episode->setImage($episodeImage);
 
                         $episode->setSeason($season);
+
+                        $season->addEpisode($episode);
 
                         $em->persist($episode);
                     }

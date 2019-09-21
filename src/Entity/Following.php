@@ -10,8 +10,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *      collectionOperations={"get"},
- *      itemOperations={"get", "put", "delete"},
+ *      collectionOperations={
+ *          "get"={"access_control"="object.getUser() == user"},
+ *      },
+ *      itemOperations={
+ *          "get"={"access_control"="object.getUser() == user"},
+ *          "put"={"method"="PATCH"},
+ *          "delete"
+ *      },
  *      attributes={"order"={"id": "DESC", "episode"}, "force_eager"=true},
  *      normalizationContext={"groups"={"get_following"}, "enable_max_depth"=true}
  * )
