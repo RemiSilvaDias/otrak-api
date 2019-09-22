@@ -56,14 +56,19 @@ setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
 
 ## Load data into database
 
-First create the file
-
 To execute on bash:
+
+If the database already exists:
+```bash
+php bin/console doctrine:database:drop --force
+```
+
+Then:
 
 ```bash
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
-php bin/console hautelook:fixtures:load
+php bin/console doctrine:fixtures:load
 ```
 
-A super admin user with the password 'admin' will be create !!! only for dev purpose, DO NOT LOAD THE FIXTURES IN PROD
+A super admin user with the email 'admin@oc.io' and the password 'admin' will be created !!! only for dev purpose, DO NOT LOAD THE FIXTURES IN PROD (or change the data and then erase the file)

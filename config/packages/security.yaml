@@ -56,6 +56,7 @@ security:
         - { path: ^/api/shows/next, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/followings, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/shows, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: /api, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1, host: localhost }
+        - { path: /api, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
+        - { path: /api, roles: IS_AUTHENTICATED_ANONYMOUSLY, host: localhost }
         - { path: /api, roles: ROLE_ADMIN }
         # - { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY, host: localhost }

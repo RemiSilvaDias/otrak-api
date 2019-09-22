@@ -24,11 +24,11 @@ class UserSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::VIEW => ['setPassword', EventPriorities::POST_VALIDATE],
+            KernelEvents::VIEW => ['setUpdateAtValue', EventPriorities::POST_VALIDATE],
         ];
     }
 
-    public function setPassword(GetResponseForControllerResultEvent $event)
+    public function setUpdateAtValue(GetResponseForControllerResultEvent $event)
     {
         $user = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
@@ -37,13 +37,8 @@ class UserSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (Request::METHOD_PUT === $method) {
-            $password = $this->passwordEncoder->encodePassword($user, $user->getPlainPassword());
-            $user->setPassword($password);
-
+        if (Request::METHOD_PUT === $method || Request::METHOD_PATCH === $method) {
             $user->setUpdatedAt(new \DateTime());
-            
-            $user->eraseCredentials();
         }
     }
 }

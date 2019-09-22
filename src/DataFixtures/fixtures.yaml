@@ -1,6 +1,3 @@
-parameters:
-  hash_user_admin: $argon2id$v=19$m=65536,t=4,p=1$tmA33fnjxF/d82Cj5O3kKQ$7T8muYSFBnczBEXGWjhItVO4GxdJokjkGCY3Lp8vMnE #admin
-
 App\Entity\Role:
   role_super_admin:
     code: 'ROLE_SUPER_ADMIN'
@@ -15,8 +12,7 @@ App\Entity\Role:
 App\Entity\User:
   user_admin:
     username: 'admin'
-    email (unique): '<email()>'
-    password: <{hash_user_admin}>
+    email: 'admin@oc.io'
+    plainPassword: 'admin'
     role: '@role_super_admin'
     createdAt: '<dateTime()>'
-    updatedAt: '<dateTime()>'

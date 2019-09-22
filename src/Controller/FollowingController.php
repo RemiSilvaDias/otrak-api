@@ -109,14 +109,17 @@ class FollowingController extends AbstractController
                     break;
             }
 
-            $type = $typeRepository->findOneByName($showApi->type);
-            if (is_null($type)) {
-                $type = new Type();
-                $type->setName($showApi->type);
-                $em->persist($type);
+            if (!is_null($showApi->type)) {
+                $type = $typeRepository->findOneByName($showApi->type);
+                if (is_null($type)) {
+                    $type = new Type();
+                    $type->setName($showApi->type);
+                    $type->addShow($show);
+                    $em->persist($type);
 
-                $show->setType($type);
-            } else $show->setType($type);
+                    $show->setType($type);
+                } else $show->setType($type);
+            }
 
             $network = null;
             if (!is_null($showApi->network)) {
@@ -124,6 +127,7 @@ class FollowingController extends AbstractController
                 if (is_null($networkDb)) {
                     $network = new Network();
                     $network->setName($showApi->network->name);
+                    $network->addShow($show);
                     $em->persist($network);
 
                     $show->setNetwork($network);
@@ -133,6 +137,7 @@ class FollowingController extends AbstractController
                 if (is_null($networkDb)) {
                     $network = new Network();
                     $network->setName($showApi->webChannel->name);
+                    $network->addShow($show);
                     $em->persist($network);
 
                     $show->setNetwork($network);
@@ -145,6 +150,7 @@ class FollowingController extends AbstractController
                 if (is_null($genre)) {
                     $genre = new Genre();
                     $genre->setName($currentGenre);
+                    $genre->addShow($show);
                     $em->persist($genre);
 
                     $show->addGenre($genre);
@@ -230,7 +236,7 @@ class FollowingController extends AbstractController
             $em->persist($following);
         }
 
-        if ($seasonNumber > 0) {
+        if ($seasonNumber > 0 && ($status <= self::TRACKING_COMPLETED || $status == self::TRACKING_STOPPED)) {
             foreach ($show->getSeasons() as $seasonShow) {
                 if ($seasonShow->getNumber() <= $seasonNumber) {
                     if($seasonShow->getNumber() == $seasonNumber) {
@@ -242,8 +248,7 @@ class FollowingController extends AbstractController
                                 
                                 $following->setUser($user);
                                 $following->setStartDate(new \DateTime());
-                                $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
-                                $following->setStatus($followingStatus);
+                                $following->setStatus(self::TRACKING_COMPLETED);
                                 $following->setTvShow($show);
                                 $following->setSeason($seasonShow);
                                 
@@ -252,7 +257,7 @@ class FollowingController extends AbstractController
                             }
                         }
                     } else {
-                        foreach ($seasonShow as $episodeShow) {
+                        foreach ($seasonShow->getEpisodes() as $episodeShow) {
                             $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
                             
                             if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime()) {
@@ -260,8 +265,7 @@ class FollowingController extends AbstractController
                                 
                                 $following->setUser($user);
                                 $following->setStartDate(new \DateTime());
-                                $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
-                                $following->setStatus($followingStatus);
+                                $following->setStatus(self::TRACKING_COMPLETED);
                                 $following->setTvShow($show);
                                 $following->setSeason($seasonShow);
 
@@ -295,7 +299,10 @@ class FollowingController extends AbstractController
             }
         }
 
-        $jsonResponse = new JsonResponse(['response' => 'success']);
+        $jsonResponse = new JsonResponse([
+            'Code' => 200,
+            'Message' => 'success'
+        ]);
         
         return $jsonResponse;
     }
