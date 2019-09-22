@@ -236,7 +236,7 @@ class FollowingController extends AbstractController
             $em->persist($following);
         }
 
-        if ($seasonNumber > 0) {
+        if ($seasonNumber > 0 && ($status <= self::TRACKING_COMPLETED || $status == self::TRACKING_STOPPED)) {
             foreach ($show->getSeasons() as $seasonShow) {
                 if ($seasonShow->getNumber() <= $seasonNumber) {
                     if($seasonShow->getNumber() == $seasonNumber) {
@@ -248,8 +248,7 @@ class FollowingController extends AbstractController
                                 
                                 $following->setUser($user);
                                 $following->setStartDate(new \DateTime());
-                                $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
-                                $following->setStatus($followingStatus);
+                                $following->setStatus(self::TRACKING_COMPLETED);
                                 $following->setTvShow($show);
                                 $following->setSeason($seasonShow);
                                 
@@ -266,8 +265,7 @@ class FollowingController extends AbstractController
                                 
                                 $following->setUser($user);
                                 $following->setStartDate(new \DateTime());
-                                $followingStatus = ($status == self::TRACKING_WATCHING ? self::TRACKING_COMPLETED : $status);
-                                $following->setStatus($followingStatus);
+                                $following->setStatus(self::TRACKING_COMPLETED);
                                 $following->setTvShow($show);
                                 $following->setSeason($seasonShow);
 
