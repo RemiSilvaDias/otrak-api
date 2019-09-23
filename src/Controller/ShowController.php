@@ -76,7 +76,7 @@ class ShowController extends AbstractController
             $latestEpisodeNumber = 0;
             $latestEpisodeSeason = 0;
 
-            if (!is_null($response->show->_links->previousepisode)) {
+            if (isset($response->show->_links->previousepisode)) {
                 $lastEpisodeId = 0;
                 \preg_match('/(\d+)$/', $response->show->_links->previousepisode->href, $lastEpisodeId, PREG_OFFSET_CAPTURE);
                 $lastEpisode = ApiController::retrieveData("get", "lastEpisode", $lastEpisodeId[0][0]);

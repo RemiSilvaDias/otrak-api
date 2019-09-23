@@ -80,7 +80,7 @@ class ApiController extends AbstractController
 
             $data->set(file_get_contents($endpoint));
     
-            $data->expiresAfter(20);
+            $data->expiresAfter(3600);
             $cache->save($data);
         } 
 
