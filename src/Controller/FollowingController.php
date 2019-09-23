@@ -164,6 +164,7 @@ class FollowingController extends AbstractController
                 $season = new Season();
 
                 $season->setNumber($currentSeason->number);
+                $seasonIndex = $currentSeason->number;
 
                 $seasonPoster = '';
                 if (!is_null($currentSeason->image)) $seasonPoster = $currentSeason->image->original;
