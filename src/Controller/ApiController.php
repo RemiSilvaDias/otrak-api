@@ -48,7 +48,10 @@ class ApiController extends AbstractController
                 case 'season':
                 $endpoint = "http://api.tvmaze.com/shows/".$id."/seasons";
                 break;
-                case 'episode':
+                case 'firstEpisode':
+                $endpoint = "http://api.tvmaze.com/shows/".$id."/episodebynumber?season=1&number=1";
+                break; 
+                case 'lastEpisode':
                 $endpoint = "http://api.tvmaze.com/episodes/".$id;
                 break; 
                 case 'scheduleEpisodes':
@@ -77,7 +80,7 @@ class ApiController extends AbstractController
 
             $data->set(file_get_contents($endpoint));
     
-            $data->expiresAfter(20);
+            $data->expiresAfter(3600);
             $cache->save($data);
         } 
 

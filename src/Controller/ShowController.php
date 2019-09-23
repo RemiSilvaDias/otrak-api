@@ -73,6 +73,18 @@ class ShowController extends AbstractController
             $runtime = 0;
             if (!is_null($response->show->runtime)) $runtime = $response->show->runtime;
 
+            $latestEpisodeNumber = 0;
+            $latestEpisodeSeason = 0;
+
+            if (isset($response->show->_links->previousepisode)) {
+                $lastEpisodeId = 0;
+                \preg_match('/(\d+)$/', $response->show->_links->previousepisode->href, $lastEpisodeId, PREG_OFFSET_CAPTURE);
+                $lastEpisode = ApiController::retrieveData("get", "lastEpisode", $lastEpisodeId[0][0]);
+
+                $latestEpisodeNumber = $lastEpisode->number;
+                $latestEpisodeSeason = $lastEpisode->season;
+            }
+
             $shows[] = array(
                 'name' => $name,
                 'status' => $status,
@@ -84,6 +96,8 @@ class ShowController extends AbstractController
                 'runtime' => $runtime,
                 'id_tvmaze' => $response->show->id,
                 'premiered' => $response->show->premiered,
+                'latestEpisodeNumber' => $latestEpisodeNumber,
+                'latestEpisodeSeason' => $latestEpisodeSeason,
             );
         }
 
