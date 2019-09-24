@@ -85,6 +85,8 @@ class UserController extends AbstractController
     }
 
     /**
+     * Return user info
+     * 
      * @Route("/api/users/profile", methods={"GET"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
