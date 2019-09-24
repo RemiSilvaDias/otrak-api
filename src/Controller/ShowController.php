@@ -148,13 +148,13 @@ class ShowController extends AbstractController
                 $found = false;
                 
                 foreach($followingListUser as $following) {
-                    if (!is_null($following->getEpisode()) && $following->getTvShow()->getIdTvmaze() == $value->show->id && ($following->getSeason()->getNumber() == $value->season && $following->getEpisode()->getNumber() == $value->number - 1)) {
+                    if ($found === false && !is_null($following->getEpisode()) && $following->getTvShow()->getIdTvmaze() == $value->show->id && ($following->getSeason()->getNumber() == $value->season && $following->getEpisode()->getNumber() == $value->number - 1)) {
+                        $value->tracked = $tracked;
                         $found = !$found;
-                        $following->tracked = $tracked;
                     }
                 }
 
-                if (!$found) unset($episodesApi[$key]);
+                if ($found === false) unset($episodesApi[$key]);
             }
         }
 
