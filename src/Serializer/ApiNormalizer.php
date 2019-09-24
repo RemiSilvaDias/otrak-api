@@ -3,7 +3,9 @@
 namespace App\Serializer;
 
 use App\Entity\Show;
+use App\Entity\Following;
 use App\Controller\ApiController;
+use App\Repository\FollowingRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -12,14 +14,16 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     private $decorated;
+    private $followingRepository;
 
-    public function __construct(NormalizerInterface $decorated)
+    public function __construct(NormalizerInterface $decorated, FollowingRepository $followingRepository)
     {
         if (!$decorated instanceof DenormalizerInterface) {
             throw new \InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
         }
 
         $this->decorated = $decorated;
+        $this->followingRepository = $followingRepository;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -31,7 +35,19 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     {
         $data = $this->decorated->normalize($object, $format, $context);
 
-        if($object instanceof Show) {
+        if ($object instanceof Following) {
+            if ($context['subresource_operation_name'] == 'api_users_followings_get_subresource' && (is_null($object->getSeason()) && is_null($object->getEpisode()))) {
+                $latestFollow = $this->followingRepository->findOneBy(['user' => $object->getUser(), 'tvShow' => $object->getTvShow()], ['id' => 'DESC']);
+                
+                $latestFollowSeason = $latestFollow->getEpisode()->getSeason()->getNumber();
+                $latestFollowEpisode = $latestFollow->getEpisode()->getNumber();
+
+                $data['latestFollowSeason'] = $latestFollowSeason;
+                $data['latestFollowEpisode'] = $latestFollowEpisode;
+            }
+        }
+
+        if ($object instanceof Show) {
             if (is_array($data)) {
                 if ($context['operation_type'] != 'subresource') {
                     $showApi = ApiController::retrieveData('get', 'showFull', $object->getIdTvmaze());

@@ -17,12 +17,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "get"={"access_control"="object.getUser() == user"},
  *          "put"={
  *              "method"="PATCH",
- *              "path"="/followings/{id}"
+ *              "path"="/followings/{id}",
  *          },
  *          "delete"={"access_control"="object.getUser() == user"}
  *      },
  *      attributes={"order"={"id": "DESC", "episode"}, "force_eager"=true},
- *      normalizationContext={"groups"={"get_following"}, "enable_max_depth"=true}
+ *      normalizationContext={"groups"={"get_following"}, "enable_max_depth"=true},
  * )
  * @ORM\Entity(repositoryClass="App\Repository\FollowingRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -120,7 +120,7 @@ class Following
         return $this->endDate;
     }
 
-    public function setEndDate(?\DateTimeInterface $endDate): self
+    public function setEndDate(?\DateTimeInterface $endDate = null): self
     {
         $this->endDate = $endDate;
 
