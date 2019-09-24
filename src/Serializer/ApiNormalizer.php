@@ -39,7 +39,6 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
         if ($object instanceof Following) {
             if (isset($context['subresource_operation_name']) && $context['subresource_operation_name'] == 'api_users_followings_get_subresource' && (is_null($object->getSeason()) && is_null($object->getEpisode()))) {
                 $latestFollow = $this->followingRepository->findOneBy(['user' => $object->getUser(), 'tvShow' => $object->getTvShow()], ['id' => 'DESC']);
-                
                 $latestFollowSeason = 0;
                 $latestFollowEpisode = 0;
                 
@@ -50,6 +49,12 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
                 $data['latestFollowSeason'] = $latestFollowSeason;
                 $data['latestFollowEpisode'] = $latestFollowEpisode;
+            } else if (!is_null($object->getSeason()) && !is_null($object->getEpisode())) {
+                $showFollow = $this->followingRepository->findOneBy(['user' => $object->getUser(), 'tvShow' => $object->getTvShow(), 'season' => null, 'episode' => null]);
+
+                $showFollowId = $showFollow->getId();
+
+                $data['showFollowId'] = $showFollowId;
             }
         }
 

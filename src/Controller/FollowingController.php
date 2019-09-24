@@ -291,19 +291,21 @@ class FollowingController extends AbstractController
 
         // Auto setup the status of the tracking of the show related to the tracking of the episode
         if (!is_null($lastSeason->getSeason())) {
-            if ($lastSeason->getSeason()->getNumber() == $show->getSeasons()->count() && $lastSeason->getEpisode()->getNumber() == $lastSeason->getSeason()->getEpisodeCount()) {
+            if ($lastSeason->getSeason()->getNumber() == $show->getSeasons()->count() && $lastSeason->getEpisode()->getNumber() == $lastSeason->getSeason()->getEpisodes()->last()->getNumber()) {
                 $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
 
                 $showTracking->setStatus(self::TRACKING_COMPLETED);
                 $showTracking->setEndDate(new \DateTime());
 
                 $em->persist($showTracking);
+                $em->flush();
             } else if ($show->getStatus() == self::STATUS_RUNNING && !is_bool($show->getSeasons()->last()->getPremiereDate()) && (is_null($show->getSeasons()->last()->getPremiereDate()) || $show->getSeasons()->last()->getEpisodeCount() == 0 || $show->getSeasons()->last()->getPremiereDate() > new \DateTime() || is_null($show->getSeasons()->last()->getEpisodes()->first()->getAirstamp()) || (!is_null($show->getSeasons()->last()->getEpisodes()->first()->getAirstamp()) && $show->getSeasons()->last()->getEpisodes()->first()->getAirstamp() > new \DateTime()))) {
                 $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
 
                 $showTracking->setStatus(self::TRACKING_UPCOMING);
 
                 $em->persist($showTracking);
+                $em->flush();
             }
         }
 
