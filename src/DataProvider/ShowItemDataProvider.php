@@ -37,6 +37,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
     {
         $show = $this->repository->findOneBy(['id_tvmaze' => $id]);
 
+        // If the show doesn't exist to the database, add it to it
         if ($show === null) {
             $showApi = ApiController::retrieveData('get', 'showComplete', $id);
 

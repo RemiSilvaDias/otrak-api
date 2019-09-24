@@ -35,18 +35,26 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     {
         $data = $this->decorated->normalize($object, $format, $context);
 
+        // Add the latest episode follow in the show information on the follow reponse
         if ($object instanceof Following) {
             if ($context['subresource_operation_name'] == 'api_users_followings_get_subresource' && (is_null($object->getSeason()) && is_null($object->getEpisode()))) {
                 $latestFollow = $this->followingRepository->findOneBy(['user' => $object->getUser(), 'tvShow' => $object->getTvShow()], ['id' => 'DESC']);
                 
-                $latestFollowSeason = $latestFollow->getEpisode()->getSeason()->getNumber();
-                $latestFollowEpisode = $latestFollow->getEpisode()->getNumber();
+                $latestFollowSeason = 0;
+                $latestFollowEpisode = 0;
+                
+                if (null !== $latestFollow->getEpisode()) {
+                    $latestFollowSeason = $latestFollow->getEpisode()->getSeason()->getNumber();
+                    $latestFollowEpisode = $latestFollow->getEpisode()->getNumber();
+                }
 
                 $data['latestFollowSeason'] = $latestFollowSeason;
                 $data['latestFollowEpisode'] = $latestFollowEpisode;
             }
         }
 
+        // Return the cast to the response when getting the detail of a specific show
+        // Return the number of seasons and episodes of a specific show
         if ($object instanceof Show) {
             if (is_array($data)) {
                 if ($context['operation_type'] != 'subresource') {

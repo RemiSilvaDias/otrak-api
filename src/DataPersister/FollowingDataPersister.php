@@ -31,6 +31,9 @@ final class FollowingDataPersister implements DataPersisterInterface
         return $data;
     }
 
+    /**
+     * Custom remove a following. If a show is removed, it'll remove all the episode associated to the show and the user in the following
+     */
     public function remove($data)
     {
         if (is_null($data->getSeason()) && is_null($data->getEpisode())) {

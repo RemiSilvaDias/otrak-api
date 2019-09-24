@@ -31,6 +31,8 @@ class ShowController extends AbstractController
     public const TRACKING_STOPPED = 4;
 
     /**
+     * Search a show in the external API and return the relevant data to the front
+     * 
      * @Route("/shows/search/{search}", methods={"GET"})
      */
     public function searchShows(string $search, Request $request, ShowRepository $showRepository)
@@ -107,21 +109,26 @@ class ShowController extends AbstractController
     }
 
     /**
+     * Give the list of the episodes aired the last 24h. If the user is connected, only display the shows he's tracking when available
+     * 
      * @Route("/shows/aired", methods={"GET"})
      */
     public function aired(ShowRepository $showRepository, FollowingRepository $followingRepository)
     {
         $episodesApi = [];
         $episodes = [];
+        $tracked = false;
 
         $series = ApiController::retrieveData("get", "scheduleEpisodes", 'scheduleUS');
         $animes = ApiController::retrieveData("get", "scheduleAnimeEpisodes", 'scheduleJP');
 
         foreach ($series as $serie) {
+            $serie->tracked = $tracked;
             $episodesApi[] = $serie;
         }
 
         foreach ($animes as $anime) {
+            $anime->tracked = $tracked;
             $episodesApi[] = $anime;
         }
 
@@ -135,12 +142,16 @@ class ShowController extends AbstractController
 
         if (!is_null($user)) {
             $followingListUser = $followingRepository->findBy(['user' => $user], ['id' => 'DESC']);
+            $tracked = true;
 
             foreach ($episodesApi as $key => $value) {
                 $found = false;
                 
                 foreach($followingListUser as $following) {
-                    if (!is_null($following->getEpisode()) && $following->getTvShow()->getIdTvmaze() == $value->show->id && ($following->getSeason()->getNumber() == $value->season && $following->getEpisode()->getNumber() == $value->number - 1)) $found = !$found;
+                    if (!is_null($following->getEpisode()) && $following->getTvShow()->getIdTvmaze() == $value->show->id && ($following->getSeason()->getNumber() == $value->season && $following->getEpisode()->getNumber() == $value->number - 1)) {
+                        $found = !$found;
+                        $following->tracked = $tracked;
+                    }
                 }
 
                 if (!$found) unset($episodesApi[$key]);
@@ -208,6 +219,7 @@ class ShowController extends AbstractController
                 'poster' => $poster,
                 'id_tvmaze' => $response->id,
                 'airstamp' => $response->airstamp,
+                'tracked' => $response->tracked,
             );
         }
 
@@ -217,6 +229,8 @@ class ShowController extends AbstractController
     }
 
     /**
+     * Give the list of the next episode to watch of the tracked shows
+     * 
      * @Route("/shows/next", methods={"GET"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */

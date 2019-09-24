@@ -40,6 +40,9 @@ class FollowingController extends AbstractController
     public const TRACKING_STOPPED = 4;
 
     /**
+     * Route to start the tracking of a show
+     * Add the show to the database if it doesn't exist
+     * 
      * @Route("/followings/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
      */
     public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
@@ -48,6 +51,7 @@ class FollowingController extends AbstractController
 
         $show = $showRepository->findOneBy(['id_tvmaze' => $showId]);
 
+        // Add show to the database if not found
         if (is_null($show)) {
             $showApi = ApiController::retrieveData('get', 'showComplete', $showId);
         
@@ -224,6 +228,7 @@ class FollowingController extends AbstractController
 
         $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
 
+        // Add the tracking of the show
         if (is_null($showTracking)) {
             $following = new Following();
 
@@ -237,6 +242,7 @@ class FollowingController extends AbstractController
             $em->persist($following);
         }
 
+        // Add to the tracking the episodes specified in the request
         if ($seasonNumber > 0 && ($status <= self::TRACKING_COMPLETED || $status == self::TRACKING_STOPPED)) {
             foreach ($show->getSeasons() as $seasonShow) {
                 if ($seasonShow->getNumber() <= $seasonNumber) {
@@ -283,6 +289,7 @@ class FollowingController extends AbstractController
 
         $lastSeason = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show], ['id' => 'DESC']);
 
+        // Auto setup the status of the tracking of the show related to the tracking of the episode
         if (!is_null($lastSeason->getSeason())) {
             if ($lastSeason->getSeason()->getNumber() == $show->getSeasons()->count() && $lastSeason->getEpisode()->getNumber() == $lastSeason->getSeason()->getEpisodeCount()) {
                 $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
