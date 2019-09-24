@@ -34,12 +34,13 @@ final class FollowingDataPersister implements DataPersisterInterface
     public function remove($data)
     {
         if (is_null($data->getSeason()) && is_null($data->getEpisode())) {
-            $episodesShowFollowed = $this->followingRepository->findby(['user' => $data->getUser(), 'tvShow' => $data->getTvShow()]);
+            $episodesShowFollowed = $this->followingRepository->findBy(['user' => $data->getUser(), 'tvShow' => $data->getTvShow()]);
 
             foreach ($episodesShowFollowed as $episode) {
                 $this->em->remove($episode);
             }
 
+            $this->remove($data);
             $this->em->flush();
         } else {
             $this->em->remove($data);
