@@ -133,7 +133,7 @@ class ShowController extends AbstractController
         }
 
         \usort($episodesApi, function($item1, $item2) {
-            return $item2->airstamp <=> $item1->airstamp;
+            return $item1->airstamp <=> $item2->airstamp;
         });
 
         $episodesApiBackup = $episodesApi;
