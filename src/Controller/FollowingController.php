@@ -51,7 +51,7 @@ class FollowingController extends AbstractController
 
         $show = $showRepository->findOneBy(['id_tvmaze' => $showId]);
 
-        // Add show to the database if not found
+        /* Add show to the database if not found */
         if (is_null($show)) {
             $showApi = ApiController::retrieveData('get', 'showComplete', $showId);
         
@@ -242,7 +242,7 @@ class FollowingController extends AbstractController
             $em->persist($following);
         }
 
-        // Add to the tracking the episodes specified in the request
+        /* Add to the tracking the episodes specified in the request */
         if ($seasonNumber > 0 && ($status <= self::TRACKING_COMPLETED || $status == self::TRACKING_STOPPED)) {
             foreach ($show->getSeasons() as $seasonShow) {
                 if ($seasonShow->getNumber() <= $seasonNumber) {
@@ -289,7 +289,7 @@ class FollowingController extends AbstractController
 
         $lastSeason = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show], ['id' => 'DESC']);
 
-        // Auto setup the status of the tracking of the show related to the tracking of the episode
+        /* Auto setup the status of the tracking of the show related to the tracking of the episode */
         if (!is_null($lastSeason->getSeason())) {
             if ($lastSeason->getSeason()->getNumber() == $show->getSeasons()->count() && $lastSeason->getEpisode()->getNumber() == $lastSeason->getSeason()->getEpisodes()->last()->getNumber()) {
                 $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
