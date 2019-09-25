@@ -67,6 +67,42 @@ class UserController extends AbstractController
     }
 
     /**
+     * Get shows followed by user
+     *
+     * @Route("/api/users/me/followings/shows", name="shows_following", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function showsFollowing(FollowingRepository $followingRepository)
+    {
+        $showsJson = [];
+        $user = $this->getUser();
+
+        $showsFollowing = $followingRepository->findBy(['user' => $user, 'season' => null, 'episode' => null], ['id' => 'DESC']);
+
+        foreach ($showsFollowing as $show) {
+            $latestFollow = $followingRepository->findOneBy(['user' => $show->getUser(), 'tvShow' => $show->getTvShow()], ['id' => 'DESC']);
+            $latestFollowSeason = 0;
+            $latestFollowEpisode = 0;
+            
+            if (null !== $latestFollow->getEpisode()) {
+                $latestFollowSeason = $latestFollow->getEpisode()->getSeason()->getNumber();
+                $latestFollowEpisode = $latestFollow->getEpisode()->getNumber();
+            }
+
+            $showJson =  $this->get('serializer')->serialize($show, 'json');
+            $showJson = \json_decode($showJson);
+
+            $showJson->latestFollowSeason = $latestFollowSeason;
+            $showJson->latestFollowEpisode = $latestFollowEpisode;
+            $showJson->idTvmaze = $show->getTvShow()->getIdTvmaze();
+
+            $showsJson[] = $showJson;
+        }
+
+        return new JsonResponse($showsJson);
+    }
+
+    /**
      * User login route
      * 
      * @Route("/api/login", name="login", methods={"POST"})
