@@ -58,27 +58,27 @@ class Following
     private $status;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="followings")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="followings", fetch="EXTRA_LAZY")
      * @Assert\NotBlank
      */
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Episode", inversedBy="followings")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Episode", inversedBy="followings", fetch="EXTRA_LAZY")
      * @ApiSubresource
      * @Groups("get_following")
      */
     private $episode;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="followings")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Season", inversedBy="followings", fetch="EXTRA_LAZY")
      * @ApiSubresource
      * @Groups("get_following")
      */
     private $season;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Show", inversedBy="followings")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Show", inversedBy="followings", fetch="EXTRA_LAZY")
      * @ApiSubresource
      * @Assert\NotBlank
      * @Groups("get_following")

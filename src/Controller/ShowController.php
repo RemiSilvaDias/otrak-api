@@ -244,14 +244,15 @@ class ShowController extends AbstractController
         $followings = $followingRepository->findBy(['user' => $user], ['episode' => 'DESC']);
 
         $lastShowIndex = 0;
+        $onTrack = false;
 
         foreach ($followings as $following) {
             $showFollowing = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $following->getTvShow(), 'season' => null, 'episode' => null]);
 
             if ($showFollowing->getStatus() == self::TRACKING_WATCHING && $following->getStatus() == self::TRACKING_COMPLETED && !is_null($following->getEpisode()) && $lastShowIndex != $following->getTvShow()->getIdTvmaze()) {
-                /* $nextEpisodeId = $following->getEpisode()->getId() + 1;
-                $nextEpisode = $episodeRepository->find($nextEpisodeId); */
                 $nextEpisode = $episodeRepository->findOneBy(['season' => $following->getEpisode()->getSeason(), 'number' => $following->getEpisode()->getNumber() + 1]);
+
+                if ($following->getTvShow()->getIdTvmaze() != $lastShowIndex) $onTrack = false;
 
                 if(!is_null($nextEpisode) && $nextEpisode->getSeason()->getTvShow() != $following->getTvShow()) {
                     $nextSeason = $seasonRepository->findOneBy(['tvShow' => $following->getTvShow(), 'number' => $following->getSeason()->getNumber() + 1]);
@@ -264,7 +265,9 @@ class ShowController extends AbstractController
                 $currentDatetime = new \DateTime();
 
                 if ((!is_null($nextEpisode) && !is_bool($nextEpisode))) {
-                    $episodes[] = $nextEpisode;
+                    if ($nextEpisode->getAirstamp() > $currentDatetime) $onTrack = true;
+                    
+                    if ($onTrack === false) $episodes[] = $nextEpisode;
 
                     $lastShowIndex = $following->getTvShow()->getIdTvmaze();
                 }
