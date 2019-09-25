@@ -300,14 +300,20 @@ class FollowingController extends AbstractController
                 $em->persist($showTracking);
                 $em->flush();
             } else if ($show->getStatus() == self::STATUS_RUNNING && !is_bool($show->getSeasons()->last()->getPremiereDate()) && (is_null($show->getSeasons()->last()->getPremiereDate()) || $show->getSeasons()->last()->getEpisodeCount() == 0 || $show->getSeasons()->last()->getPremiereDate() > new \DateTime() || is_null($show->getSeasons()->last()->getEpisodes()->first()->getAirstamp()) || (!is_null($show->getSeasons()->last()->getEpisodes()->first()->getAirstamp()) && $show->getSeasons()->last()->getEpisodes()->first()->getAirstamp() > new \DateTime()))) {
-                $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
+                $previousSeasonId = $show->getSeasons()->last()->getId() - 1;
 
-                $showTracking->setStatus(self::TRACKING_UPCOMING);
+                if ($lastSeason->getSeason()->getId() == $previousSeasonId) {
+                    $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
 
-                $em->persist($showTracking);
-                $em->flush();
+                    $showTracking->setStatus(self::TRACKING_UPCOMING);
+
+                    $em->persist($showTracking);
+                    $em->flush();
+                }
             }
         }
+
+        $em->clear();
 
         $jsonResponse = new JsonResponse([
             'Code' => 200,

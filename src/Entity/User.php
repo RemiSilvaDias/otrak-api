@@ -78,7 +78,7 @@ class User implements UserInterface, \Serializable
     private $role;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\Following", mappedBy="user", fetch="EXTRA_LAZY")
      * @ApiSubresource
      */
     private $followings;

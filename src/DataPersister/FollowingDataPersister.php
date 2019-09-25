@@ -43,11 +43,11 @@ final class FollowingDataPersister implements DataPersisterInterface
                 $this->em->remove($episode);
             }
 
-            $this->remove($data);
-            $this->em->flush();
+            $this->em->remove($data);
         } else {
             $this->em->remove($data);
-            $this->em->flush();
         }
+
+        $this->em->flush();
     }
 }
