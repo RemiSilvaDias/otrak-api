@@ -35,7 +35,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     {
         $data = $this->decorated->normalize($object, $format, $context);
 
-        // Add the latest episode follow in the show information on the follow reponse
+        /* Add the latest episode follow in the show information on the follow reponse */
         if ($object instanceof Following) {
             if (isset($context['subresource_operation_name']) && $context['subresource_operation_name'] == 'api_users_followings_get_subresource' && (is_null($object->getSeason()) && is_null($object->getEpisode()))) {
                 $latestFollow = $this->followingRepository->findOneBy(['user' => $object->getUser(), 'tvShow' => $object->getTvShow()], ['id' => 'DESC']);
@@ -49,6 +49,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
                 $data['latestFollowSeason'] = $latestFollowSeason;
                 $data['latestFollowEpisode'] = $latestFollowEpisode;
+                $data['idTvmaze'] = $object->getTvShow()->getIdTvmaze();
             } else if (!is_null($object->getSeason()) && !is_null($object->getEpisode())) {
                 $showFollow = $this->followingRepository->findOneBy(['user' => $object->getUser(), 'tvShow' => $object->getTvShow(), 'season' => null, 'episode' => null]);
 
@@ -58,8 +59,8 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
             }
         }
 
-        // Return the cast to the response when getting the detail of a specific show
-        // Return the number of seasons and episodes of a specific show
+        /* Return the cast to the response when getting the detail of a specific show
+        Return the number of seasons and episodes of a specific show */
         if ($object instanceof Show) {
             if (is_array($data)) {
                 if ($context['operation_type'] != 'subresource') {

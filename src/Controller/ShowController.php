@@ -186,7 +186,7 @@ class ShowController extends AbstractController
                 $id = $showDb->getId();
                 $type = $showDb->getType()->getName();
                 $genre = $showDb->getGenre();
-                $rating = $showDb->getRating();
+                if (!is_null($showDb->getRating())) $rating = $showDb->getRating();
                 $language = $showDb->getLanguage();
             }
 
@@ -201,7 +201,7 @@ class ShowController extends AbstractController
                 }
             }
 
-            if ($rating == 0 && !is_null($response->show->rating)) $rating = $response->show->rating->average;
+            if (isset($response->show->rating->average)) $rating = $response->show->rating->average;
             if ($language == '' && !is_null($response->show->language)) $language = $response->show->language;
 
             $episodes[] = array(
@@ -249,8 +249,9 @@ class ShowController extends AbstractController
             $showFollowing = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $following->getTvShow(), 'season' => null, 'episode' => null]);
 
             if ($showFollowing->getStatus() == self::TRACKING_WATCHING && $following->getStatus() == self::TRACKING_COMPLETED && !is_null($following->getEpisode()) && $lastShowIndex != $following->getTvShow()->getIdTvmaze()) {
-                $nextEpisodeId = $following->getEpisode()->getId() + 1;
-                $nextEpisode = $episodeRepository->find($nextEpisodeId);
+                /* $nextEpisodeId = $following->getEpisode()->getId() + 1;
+                $nextEpisode = $episodeRepository->find($nextEpisodeId); */
+                $nextEpisode = $episodeRepository->findOneBy(['season' => $following->getEpisode()->getSeason(), 'number' => $following->getEpisode()->getNumber() + 1]);
 
                 if(!is_null($nextEpisode) && $nextEpisode->getSeason()->getTvShow() != $following->getTvShow()) {
                     $nextSeason = $seasonRepository->findOneBy(['tvShow' => $following->getTvShow(), 'number' => $following->getSeason()->getNumber() + 1]);
@@ -262,7 +263,7 @@ class ShowController extends AbstractController
                 
                 $currentDatetime = new \DateTime();
 
-                if ((!is_null($nextEpisode) && !is_bool($nextEpisode)) && $nextEpisode->getAirstamp() < $currentDatetime->sub(new \DateInterval('P1D'))) {
+                if ((!is_null($nextEpisode) && !is_bool($nextEpisode))) {
                     $episodes[] = $nextEpisode;
 
                     $lastShowIndex = $following->getTvShow()->getIdTvmaze();

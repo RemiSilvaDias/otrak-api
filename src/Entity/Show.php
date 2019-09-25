@@ -93,7 +93,7 @@ class Show
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"get_episodes", "get_seasons", "get_show", "get_following"})
+     * @Groups({"get_episodes", "get_seasons", "get_following", "get_show"})
      * @Assert\NotBlank
      */
     private $id_tvmaze;
