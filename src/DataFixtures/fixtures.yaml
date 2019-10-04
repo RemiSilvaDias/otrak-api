@@ -1,0 +1,18 @@
+App\Entity\Role:
+  role_super_admin:
+    code: 'ROLE_SUPER_ADMIN'
+    name: 'Super Admin'
+  role_admin:
+    code: 'ROLE_ADMIN'
+    name: 'Admin'
+  role_user:
+    code: 'ROLE_USER'
+    name: 'User'
+
+App\Entity\User:
+  user_admin:
+    username: 'admin'
+    email: 'admin@oc.io'
+    plainPassword: 'admin'
+    role: '@role_super_admin'
+    createdAt: '<dateTime()>'
