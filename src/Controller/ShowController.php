@@ -58,7 +58,9 @@ class ShowController extends AbstractController
             }
 
             $poster = '';
-            if (!is_null($response->show->image)) $poster = $response->show->image->original;
+            if (!is_null($response->show->image)) {
+                $poster = \str_replace('http://', 'https://', $response->show->image->original);
+            }
 
             $type = '';
             if (!is_null($response->show->type)) $type = $response->show->type;
@@ -103,7 +105,7 @@ class ShowController extends AbstractController
             );
         }
 
-        $jsonResponse = new JsonResponse($shows);
+        $jsonResponse = new JsonResponse($shows, 200);
         
         return $jsonResponse;
     }
@@ -191,7 +193,9 @@ class ShowController extends AbstractController
             }
 
             $poster = '';
-            if (!is_null($response->show->image)) $poster = $response->show->image->original;
+            if (!is_null($response->show->image)) {
+                $poster = \str_replace('http://', 'https://', $response->show->image->original);
+            }
 
             if ($type == '' && !is_null($type = $response->show->type)) $type = $response->show->type;
 
@@ -223,7 +227,7 @@ class ShowController extends AbstractController
             );
         }
 
-        $jsonResponse = new JsonResponse($episodes);
+        $jsonResponse = new JsonResponse($episodes, 200);
         
         return $jsonResponse;
     }
@@ -295,7 +299,7 @@ class ShowController extends AbstractController
             }
         }
 
-        $jsonResponse = new JsonResponse($nextEpisodes);
+        $jsonResponse = new JsonResponse($nextEpisodes, 200);
         
         return $jsonResponse;
     }

@@ -47,7 +47,7 @@ class FollowingController extends AbstractController
      */
     public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
-        if ($id != $this->getUser()->getId()) throw $this->createAccessDeniedException("You can't perform this action for another user");
+        if ($id != $this->getUser()->getId()) return new JsonResponse(['message' => "You can't perform this action for another user"], 401);
 
         $show = $showRepository->findOneBy(['id_tvmaze' => $showId]);
 
@@ -64,7 +64,9 @@ class FollowingController extends AbstractController
             $show->setSummary($summary);
 
             $poster = '';
-            if (!is_null($showApi->image)) $poster = $showApi->image->original;
+            if (!is_null($showApi->image)) {
+                $poster = \str_replace('http://', 'https://', $showApi->image->original);
+            }
             $show->setPoster($poster);
 
             $website = null;
@@ -171,7 +173,9 @@ class FollowingController extends AbstractController
                 $seasonIndex = $currentSeason->number;
 
                 $seasonPoster = '';
-                if (!is_null($currentSeason->image)) $seasonPoster = $currentSeason->image->original;
+                if (!is_null($currentSeason->image)) {
+                    $seasonPoster = \str_replace('http://', 'https://', $currentSeason->image->original);
+                }
                 $season->setPoster($seasonPoster);
 
                 $seasonEpisodeCount = 0;
@@ -207,7 +211,9 @@ class FollowingController extends AbstractController
                         $episode->setAirstamp($episodeAirstamp);
 
                         $episodeImage = '';
-                        if (!is_null($currentEpisode->image)) $episodeImage = $currentEpisode->image->original;
+                        if (!is_null($currentEpisode->image)) {
+                            $episodeImage = \str_replace('http://', 'https://', $currentEpisode->image->original);
+                        }
                         $episode->setImage($episodeImage);
 
                         $episode->setSeason($season);
@@ -316,9 +322,8 @@ class FollowingController extends AbstractController
         $em->clear();
 
         $jsonResponse = new JsonResponse([
-            'Code' => 200,
-            'Message' => 'success'
-        ]);
+            'message' => 'success'
+        ], 200);
         
         return $jsonResponse;
     }
