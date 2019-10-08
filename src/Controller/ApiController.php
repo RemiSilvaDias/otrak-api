@@ -5,9 +5,9 @@ namespace App\Controller;
 use App\Repository\ShowRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\EpisodeRepository;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\httpsFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\httpsFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,35 +30,35 @@ class ApiController extends AbstractController
 
         if ($action == 'search'){
 
-            $endpoint = "http://api.tvmaze.com/search/shows?q=".$id;
+            $endpoint = "https://api.tvmaze.com/search/shows?q=".$id;
 
         }else{
 
             switch ($target){
                 
                 case 'show':
-                $endpoint = "http://api.tvmaze.com/shows/".$id;
+                $endpoint = "https://api.tvmaze.com/shows/".$id;
                 break;
                 case 'showFull':
-                $endpoint = "http://api.tvmaze.com/shows/".$id."?embed=cast";
+                $endpoint = "https://api.tvmaze.com/shows/".$id."?embed=cast";
                 break;
                 case 'showComplete':
-                $endpoint = "http://api.tvmaze.com/shows/".$id."?embed[]=seasons&embed[]=episodes&embed[]=cast";
+                $endpoint = "https://api.tvmaze.com/shows/".$id."?embed[]=seasons&embed[]=episodes&embed[]=cast";
                 break;
                 case 'season':
-                $endpoint = "http://api.tvmaze.com/shows/".$id."/seasons";
+                $endpoint = "https://api.tvmaze.com/shows/".$id."/seasons";
                 break;
                 case 'firstEpisode':
-                $endpoint = "http://api.tvmaze.com/shows/".$id."/episodebynumber?season=1&number=1";
+                $endpoint = "https://api.tvmaze.com/shows/".$id."/episodebynumber?season=1&number=1";
                 break; 
                 case 'lastEpisode':
-                $endpoint = "http://api.tvmaze.com/episodes/".$id;
+                $endpoint = "https://api.tvmaze.com/episodes/".$id;
                 break; 
                 case 'scheduleEpisodes':
-                $endpoint = "http://api.tvmaze.com/schedule?country=US";
+                $endpoint = "https://api.tvmaze.com/schedule?country=US";
                 break;
                 case 'scheduleAnimeEpisodes':
-                $endpoint = "http://api.tvmaze.com/schedule?country=JP&type=animation";
+                $endpoint = "https://api.tvmaze.com/schedule?country=JP&type=animation";
                 break;
             }
         }
