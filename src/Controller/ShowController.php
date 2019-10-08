@@ -105,7 +105,7 @@ class ShowController extends AbstractController
             );
         }
 
-        $jsonResponse = new JsonResponse($shows);
+        $jsonResponse = new JsonResponse($shows, 200);
         
         return $jsonResponse;
     }
@@ -227,7 +227,7 @@ class ShowController extends AbstractController
             );
         }
 
-        $jsonResponse = new JsonResponse($episodes);
+        $jsonResponse = new JsonResponse($episodes, 200);
         
         return $jsonResponse;
     }
@@ -299,7 +299,7 @@ class ShowController extends AbstractController
             }
         }
 
-        $jsonResponse = new JsonResponse($nextEpisodes);
+        $jsonResponse = new JsonResponse($nextEpisodes, 200);
         
         return $jsonResponse;
     }

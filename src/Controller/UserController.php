@@ -41,9 +41,8 @@ class UserController extends AbstractController
 
         if (!is_null($user)) {
             return new JsonResponse([
-                'Code' => '409',
                 'message' => 'Email already exists'
-            ]);
+            ], 409);
         }
 
         $user = new User();
@@ -59,9 +58,8 @@ class UserController extends AbstractController
         $em->flush();
 
         $jsonResponse = new JsonResponse([
-            'Code' => 200,
-            'Message' => 'success'
-        ]);
+            'message' => 'success'
+        ], 200);
 
         return $jsonResponse;
     }
@@ -99,7 +97,7 @@ class UserController extends AbstractController
             $showsJson[] = $showJson;
         }
 
-        return new JsonResponse($showsJson);
+        return new JsonResponse($showsJson, 200);
     }
 
     /**
@@ -117,7 +115,7 @@ class UserController extends AbstractController
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'avatar' => $user->getAvatar(),
-        ]);
+        ], 200);
     }
 
     /**
@@ -135,6 +133,6 @@ class UserController extends AbstractController
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'avatar' => $user->getAvatar(),
-        ]);
+        ], 200);
     }
 }

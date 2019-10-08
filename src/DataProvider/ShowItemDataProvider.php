@@ -175,7 +175,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                 'nbEpisodes' => $nbEpisodes,
                 'seasons' => $seasons,
                 'cast' => $cast,
-            ]);
+            ], 200);
 
             return $show;
         }

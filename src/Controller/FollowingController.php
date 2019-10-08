@@ -47,7 +47,7 @@ class FollowingController extends AbstractController
      */
     public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
-        if ($id != $this->getUser()->getId()) throw $this->createAccessDeniedException("You can't perform this action for another user");
+        if ($id != $this->getUser()->getId()) return new JsonResponse(['message' => "You can't perform this action for another user"], 401);
 
         $show = $showRepository->findOneBy(['id_tvmaze' => $showId]);
 
@@ -322,9 +322,8 @@ class FollowingController extends AbstractController
         $em->clear();
 
         $jsonResponse = new JsonResponse([
-            'Code' => 200,
-            'Message' => 'success'
-        ]);
+            'message' => 'success'
+        ], 200);
         
         return $jsonResponse;
     }
