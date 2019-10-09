@@ -6,11 +6,9 @@ use App\Entity\Show;
 use App\Entity\Genre;
 use App\Controller\ApiController;
 use App\Repository\ShowRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 final class ShowItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
@@ -62,7 +60,9 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             }
 
             $poster = '';
-            if (!is_null($showApi->image)) $poster = $showApi->image->original;
+            if (!is_null($showApi->image)) {
+                $poster = \str_replace('http://', 'https://', $showApi->image->original);
+            }
 
             $type = '';
             if (!is_null($showApi->type)) $type = $showApi->type;
@@ -109,7 +109,9 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                     $episodes = [];
 
                     $seasonPoster = '';
-                    if (!is_null($season->image)) $poster = $season->image->original;
+                    if (!is_null($season->image)) {
+                        $poster = \str_replace('http://', 'https://', $season->image->original);
+                    }
 
                     $episodes = [];
                     $episodesCount = 0;
@@ -145,6 +147,14 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
             $cast = null;
             if (!is_null($showApi->_embedded->cast)) $cast = $showApi->_embedded->cast;
 
+            if (null !== $cast) {
+                foreach ($cast as $currentCast) {
+                    if (isset($currentCast->person->image->original)) {
+                        $currentCast->person->image->original = \str_replace('http://', 'https://', $currentCast->person->image->original);
+                    }
+                }
+            }
+
             $show = new JsonResponse([
                 'name' => $name,
                 'summary' => $summary,
@@ -165,7 +175,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
                 'nbEpisodes' => $nbEpisodes,
                 'seasons' => $seasons,
                 'cast' => $cast,
-            ]);
+            ], 200);
 
             return $show;
         }
