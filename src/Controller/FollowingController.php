@@ -60,7 +60,7 @@ class FollowingController extends AbstractController
             $show->setName($showApi->name);
 
             $summary = '';
-            if (!is_null($showApi->officialSite)) $summary = $showApi->summary;
+            if (!is_null($showApi->summary)) $summary = $showApi->summary;
             $show->setSummary($summary);
 
             $poster = '';
@@ -81,7 +81,7 @@ class FollowingController extends AbstractController
             if (!is_null($showApi->language)) $language = $showApi->language;
             $show->setLanguage($language);
 
-            $runtime = null;
+            $runtime = 0;
             if (!is_null($showApi->runtime)) $runtime = $showApi->runtime;
             $show->setRuntime($runtime);
 
@@ -201,7 +201,10 @@ class FollowingController extends AbstractController
 
                         $episode->setName($currentEpisode->name);
                         $episode->setNumber($currentEpisode->number);
-                        $episode->setRuntime($currentEpisode->runtime);
+
+                        $runtime = 0;
+                        if (!is_null($currentEpisode->runtime)) $runtime = $currentEpisode->runtime;
+                        $episode->setRuntime($runtime);
 
                         $episodeSummary = '';
                         if (!is_null($currentEpisode->summary)) $episodeSummary = $currentEpisode->summary;
@@ -321,9 +324,7 @@ class FollowingController extends AbstractController
 
         $em->clear();
 
-        $jsonResponse = new JsonResponse([
-            'message' => 'success'
-        ], 200);
+        $jsonResponse = new JsonResponse(['message' => 'success'], 200);
         
         return $jsonResponse;
     }
