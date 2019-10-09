@@ -1,5 +1,14 @@
 # otrak-api
 
+## Requirements
+
+### PHP extensions
+- zip
+- GD
+- XML
+- curl
+- fpm (in production)
+
 ## Commands to run to init the project
 
 ```bash
