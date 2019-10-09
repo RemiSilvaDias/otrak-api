@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Show;
 use App\Controller\ApiController;
+use App\Entity\Episode;
 use App\Repository\ShowRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\EpisodeRepository;
@@ -254,7 +255,13 @@ class ShowController extends AbstractController
             $showFollowing = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $following->getTvShow(), 'season' => null, 'episode' => null]);
 
             if ($showFollowing->getStatus() == self::TRACKING_WATCHING && $following->getStatus() == self::TRACKING_COMPLETED && !is_null($following->getEpisode()) && $lastShowIndex != $following->getTvShow()->getIdTvmaze()) {
-                $nextEpisode = $episodeRepository->findOneBy(['season' => $following->getEpisode()->getSeason(), 'number' => $following->getEpisode()->getNumber() + 1]);
+                $nextEpisode = new Episode();
+                if ($following->getEpisode()->getNumber() != $following->getSeason()->getEpisodes()->count()) $nextEpisode = $episodeRepository->findOneBy(['season' => $following->getEpisode()->getSeason(), 'number' => $following->getEpisode()->getNumber() + 1]);
+                else {
+                    $nextSeason = $seasonRepository->findOneBy(['tvShow' => $following->getTvShow(), 'number' => $following->getSeason()->getNumber() + 1]);
+                    if ($nextSeason->getEpisodes()->first()->getAirstamp() < new \DateTime()) $nextEpisode = $nextSeason->getEpisodes()->first();
+                    else $nextEpisode = null;
+                }
 
                 if ($following->getTvShow()->getIdTvmaze() != $lastShowIndex) $onTrack = false;
 
