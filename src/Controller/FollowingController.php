@@ -4,22 +4,19 @@ namespace App\Controller;
 
 use App\Entity\Show;
 use App\Entity\Type;
-use App\Entity\User;
 use App\Entity\Genre;
 use App\Entity\Season;
 use App\Entity\Episode;
 use App\Entity\Network;
 use App\Entity\Following;
+use App\Utils\ApiFetcher;
 use App\Repository\ShowRepository;
 use App\Repository\TypeRepository;
 use App\Repository\UserRepository;
 use App\Repository\GenreRepository;
-use App\Repository\SeasonRepository;
-use App\Repository\EpisodeRepository;
 use App\Repository\NetworkRepository;
 use App\Repository\FollowingRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +42,7 @@ class FollowingController extends AbstractController
      * 
      * @Route("/followings/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
      */
-    public function new($id, $status, $showId, $seasonNumber, $episodeNumber, Request $request, UserRepository $userRepository, ShowRepository $showRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
+    public function new($id, $status, $showId, $seasonNumber, $episodeNumber, ApiFetcher $apiFetcher, UserRepository $userRepository, ShowRepository $showRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
     {
         if ($id != $this->getUser()->getId()) return new JsonResponse(['message' => "You can't perform this action for another user"], 401);
 
@@ -53,7 +50,7 @@ class FollowingController extends AbstractController
 
         /* Add show to the database if not found */
         if (is_null($show)) {
-            $showApi = ApiController::retrieveData('get', 'showComplete', $showId);
+            $showApi = $apiFetcher->retrieveData('get', 'showComplete', $showId);
         
             $show = new Show();
             

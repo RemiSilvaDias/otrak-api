@@ -21,7 +21,7 @@ class UserController extends AbstractController
      * 
      * @Route("/api/users/new", methods={"POST"})
      */
-    public function new(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder, RoleRepository $roleRepository, EntityManagerInterface $em)
+    public function new(Request $request, UserRepository $userRepository, RoleRepository $roleRepository, EntityManagerInterface $em)
     {
         $username = '';
         $email = '';

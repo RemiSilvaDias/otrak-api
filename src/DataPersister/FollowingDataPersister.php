@@ -5,7 +5,6 @@ namespace App\DataPersister;
 use App\Entity\Following;
 use App\Repository\FollowingRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 
 final class FollowingDataPersister implements DataPersisterInterface
