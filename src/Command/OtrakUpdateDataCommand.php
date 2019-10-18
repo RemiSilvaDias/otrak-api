@@ -14,6 +14,7 @@ use App\Repository\NetworkRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\ShowRepository;
 use App\Repository\TypeRepository;
+use App\Utils\ApiFetcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -36,6 +37,7 @@ class OtrakUpdateDataCommand extends Command
     
     protected static $defaultName = 'otrak:update:data';
 
+    private $apiFetcher;
     private $showRepository;
     private $genreRepository;
     private $typeRepository;
@@ -44,8 +46,9 @@ class OtrakUpdateDataCommand extends Command
     private $episodeRepository;
     private $em;
 
-    public function __construct(EntityManagerInterface $em, ShowRepository $showRepository, GenreRepository $genreRepository, TypeRepository $typeRepository, NetworkRepository $networkRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository)
+    public function __construct(ApiFetcher $apiFetcher, EntityManagerInterface $em, ShowRepository $showRepository, GenreRepository $genreRepository, TypeRepository $typeRepository, NetworkRepository $networkRepository, SeasonRepository $seasonRepository, EpisodeRepository $episodeRepository)
     {
+        $this->apiFetcher = $apiFetcher;
         $this->showRepository = $showRepository;
         $this->genreRepository = $genreRepository;
         $this->typeRepository = $typeRepository;
@@ -71,7 +74,7 @@ class OtrakUpdateDataCommand extends Command
         $shows = $this->showRepository->findAll();
 
         foreach ($shows as $show) {
-            $showApi = ApiController::retrieveData('get', 'showComplete', $show->getIdTvmaze());
+            $showApi = $this->apiFetcher->retrieveData('get', 'showComplete', $show->getIdTvmaze());
 
             if ($show->getApiUpdate() != $showApi->updated) {
                 $io->note(sprintf($show->getName() . ' is getting updated...'));

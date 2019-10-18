@@ -3,8 +3,7 @@
 namespace App\DataProvider;
 
 use App\Entity\Show;
-use App\Entity\Genre;
-use App\Controller\ApiController;
+use App\Utils\ApiFetcher;
 use App\Repository\ShowRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -20,10 +19,12 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
      * @var ShowRepository
      */
     private $repository;
+    private $apiFetcher;
 
-    public function __construct(ShowRepository $repository)
+    public function __construct(ShowRepository $repository, ApiFetcher $apiFetcher)
     {
         $this->repository = $repository;
+        $this->apiFetcher = $apiFetcher;
     }
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
@@ -37,7 +38,7 @@ final class ShowItemDataProvider implements ItemDataProviderInterface, Restricte
 
         /* If the show doesn't exist to the database, add it to it */
         if ($show === null) {
-            $showApi = ApiController::retrieveData('get', 'showComplete', $id);
+            $showApi = $this->apiFetcher->retrieveData('get', 'showComplete', $id);
 
             $name = $showApi->name;
 
