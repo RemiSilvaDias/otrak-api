@@ -11,8 +11,8 @@ App\Entity\Role:
 
 App\Entity\User:
   user_admin:
-    username: 'admin'
-    email: 'admin@oc.io'
-    plainPassword: 'admin'
-    role: '@role_super_admin'
+    username: 'test'
+    email: 'test@oc.io'
+    plainPassword: 'test'
+    role: '@role_user'
     createdAt: '<dateTime()>'
