@@ -7,6 +7,13 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ApiTest extends WebTestCase
 {
+    /**
+     * Create an authentificated client for the tests
+     *
+     * @param string $email
+     * @param string $password
+     * @return void
+     */
     protected function createAuthenticatedClient($email = 'test@oc.io', $password = 'test')
     {
         $client = static::createClient();
