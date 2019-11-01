@@ -2,15 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\Show;
 use App\Controller\ApiController;
 use App\Entity\Episode;
 use App\Repository\ShowRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\EpisodeRepository;
 use App\Repository\FollowingRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use App\Utils\ApiFetcher;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -36,12 +34,12 @@ class ShowController extends AbstractController
      * 
      * @Route("/shows/search/{search}", methods={"GET"})
      */
-    public function searchShows(string $search, Request $request, ShowRepository $showRepository)
+    public function searchShows(string $search, ApiFetcher $apiFetcher)
     {
         $shows = [];
         $search = str_replace("+", " ", $search);
         
-        $data = ApiController::retrieveData("search", "show", $search);
+        $data = $apiFetcher->retrieveData("search", "show", $search);
 
         foreach ($data as $response) {
             $name = $response->show->name;
@@ -84,7 +82,7 @@ class ShowController extends AbstractController
             if (isset($response->show->_links->previousepisode)) {
                 $lastEpisodeId = 0;
                 \preg_match('/(\d+)$/', $response->show->_links->previousepisode->href, $lastEpisodeId, PREG_OFFSET_CAPTURE);
-                $lastEpisode = ApiController::retrieveData("get", "lastEpisode", $lastEpisodeId[0][0]);
+                $lastEpisode = $apiFetcher->retrieveData("get", "lastEpisode", $lastEpisodeId[0][0]);
 
                 $latestEpisodeNumber = $lastEpisode->number;
                 $latestEpisodeSeason = $lastEpisode->season;
@@ -116,14 +114,14 @@ class ShowController extends AbstractController
      * 
      * @Route("/shows/aired", methods={"GET"})
      */
-    public function aired(ShowRepository $showRepository, FollowingRepository $followingRepository)
+    public function aired(ShowRepository $showRepository, FollowingRepository $followingRepository, ApiFetcher $apiFetcher)
     {
         $episodesApi = [];
         $episodes = [];
         $tracked = false;
 
-        $series = ApiController::retrieveData("get", "scheduleEpisodes", 'scheduleUS');
-        $animes = ApiController::retrieveData("get", "scheduleAnimeEpisodes", 'scheduleJP');
+        $series = $apiFetcher->retrieveData("get", "scheduleEpisodes", 'scheduleUS');
+        $animes = $apiFetcher->retrieveData("get", "scheduleAnimeEpisodes", 'scheduleJP');
 
         foreach ($series as $serie) {
             $serie->tracked = $tracked;

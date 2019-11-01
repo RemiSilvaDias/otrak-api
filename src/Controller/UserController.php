@@ -12,7 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends AbstractController
 {
@@ -21,7 +20,7 @@ class UserController extends AbstractController
      * 
      * @Route("/api/users/new", methods={"POST"})
      */
-    public function new(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $encoder, RoleRepository $roleRepository, EntityManagerInterface $em)
+    public function new(Request $request, UserRepository $userRepository, RoleRepository $roleRepository, EntityManagerInterface $em)
     {
         $username = '';
         $email = '';
@@ -106,7 +105,7 @@ class UserController extends AbstractController
      * @Route("/api/login", name="login", methods={"POST"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function login(Request $request)
+    public function login()
     {
         $user = $this->getUser();
 

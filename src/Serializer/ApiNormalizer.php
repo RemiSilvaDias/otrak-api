@@ -3,8 +3,8 @@
 namespace App\Serializer;
 
 use App\Entity\Show;
+use App\Utils\ApiFetcher;
 use App\Entity\Following;
-use App\Controller\ApiController;
 use App\Repository\FollowingRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -14,15 +14,17 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     private $decorated;
+    private $apiFetcher;
     private $followingRepository;
 
-    public function __construct(NormalizerInterface $decorated, FollowingRepository $followingRepository)
+    public function __construct(NormalizerInterface $decorated, ApiFetcher $apiFetcher, FollowingRepository $followingRepository)
     {
         if (!$decorated instanceof DenormalizerInterface) {
             throw new \InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
         }
 
         $this->decorated = $decorated;
+        $this->apiFetcher = $apiFetcher;
         $this->followingRepository = $followingRepository;
     }
 
@@ -64,7 +66,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
         if ($object instanceof Show) {
             if (is_array($data)) {
                 if ($context['operation_type'] != 'subresource') {
-                    $showApi = ApiController::retrieveData('get', 'showFull', $object->getIdTvmaze());
+                    $showApi = $this->apiFetcher->retrieveData('get', 'showFull', $object->getIdTvmaze());
 
                     $cast = null;
                     
