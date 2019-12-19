@@ -36,21 +36,42 @@ class FollowingController extends AbstractController
     public const TRACKING_UPCOMING = 3;
     public const TRACKING_STOPPED = 4;
 
+    private $apiFetcher;
+    private $userRepository;
+    private $showRepository;
+    private $followingRepository;
+    private $typeRepository;
+    private $genreRepository;
+    private $networkRepository;
+    private $em;
+
+    public function __construct(ApiFetcher $apiFetcher, UserRepository $userRepository, ShowRepository $showRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
+    {
+        $this->apiFetcher = $apiFetcher;
+        $this->userRepository = $userRepository;
+        $this->showRepository = $showRepository;
+        $this->followingRepository = $followingRepository;
+        $this->typeRepository = $typeRepository;
+        $this->genreRepository = $genreRepository;
+        $this->networkRepository = $networkRepository;
+        $this->em = $em;
+    }
+
     /**
      * Route to start the tracking of a show
      * Add the show to the database if it doesn't exist
      * 
      * @Route("/followings/new/{id}/{status}/{showId}/{seasonNumber}/{episodeNumber}", requirements={"id"="\d+", "status"="\d+", "showId"="\d+", "seasonNumber"="\d+", "episodeNumber"="\d+"}, methods={"POST"})
      */
-    public function new($id, $status, $showId, $seasonNumber, $episodeNumber, ApiFetcher $apiFetcher, UserRepository $userRepository, ShowRepository $showRepository, FollowingRepository $followingRepository, TypeRepository $typeRepository, GenreRepository $genreRepository, NetworkRepository $networkRepository, EntityManagerInterface $em)
+    public function new($id, $status, $showId, $seasonNumber, $episodeNumber)
     {
         if ($id != $this->getUser()->getId()) return new JsonResponse(['message' => "You can't perform this action for another user"], 401);
 
-        $show = $showRepository->findOneBy(['id_tvmaze' => $showId]);
+        $show = $this->showRepository->findOneBy(['id_tvmaze' => $showId]);
 
         /* Add show to the database if not found */
         if (is_null($show)) {
-            $showApi = $apiFetcher->retrieveData('get', 'showComplete', $showId);
+            $showApi = $this->apiFetcher->retrieveData('get', 'showComplete', $showId);
         
             $show = new Show();
             
@@ -113,12 +134,12 @@ class FollowingController extends AbstractController
             }
 
             if (!is_null($showApi->type)) {
-                $type = $typeRepository->findOneByName($showApi->type);
+                $type = $this->typeRepository->findOneByName($showApi->type);
                 if (is_null($type)) {
                     $type = new Type();
                     $type->setName($showApi->type);
                     $type->addShow($show);
-                    $em->persist($type);
+                    $this->em->persist($type);
 
                     $show->setType($type);
                 } else $show->setType($type);
@@ -126,41 +147,41 @@ class FollowingController extends AbstractController
 
             $network = null;
             if (!is_null($showApi->network)) {
-                $networkDb = $networkRepository->findOneByName($showApi->network->name);
+                $networkDb = $this->networkRepository->findOneByName($showApi->network->name);
                 if (is_null($networkDb)) {
                     $network = new Network();
                     $network->setName($showApi->network->name);
                     $network->addShow($show);
-                    $em->persist($network);
+                    $this->em->persist($network);
 
                     $show->setNetwork($network);
                 } else $show->setNetwork($networkDb);
             } else if (!is_null($showApi->webChannel)) {
-                $networkDb = $networkRepository->findOneByName($showApi->webChannel->name);
+                $networkDb = $this->networkRepository->findOneByName($showApi->webChannel->name);
                 if (is_null($networkDb)) {
                     $network = new Network();
                     $network->setName($showApi->webChannel->name);
                     $network->addShow($show);
-                    $em->persist($network);
+                    $this->em->persist($network);
 
                     $show->setNetwork($network);
                 } else $show->setNetwork($networkDb);
             }
 
             foreach ($showApi->genres as $currentGenre) {
-                $genre = $genreRepository->findOneByName($currentGenre);
+                $genre = $this->genreRepository->findOneByName($currentGenre);
 
                 if (is_null($genre)) {
                     $genre = new Genre();
                     $genre->setName($currentGenre);
                     $genre->addShow($show);
-                    $em->persist($genre);
+                    $this->em->persist($genre);
 
                     $show->addGenre($genre);
                 } else $show->addGenre($genre);
             }
 
-            $em->persist($show);
+            $this->em->persist($show);
 
             $seasonIndex = 1;
             foreach ($showApi->_embedded->seasons as $currentSeason) {
@@ -188,7 +209,7 @@ class FollowingController extends AbstractController
 
                 $season->setTvShow($show);
 
-                $em->persist($season);
+                $this->em->persist($season);
 
                 $show->addSeason($season);
 
@@ -220,19 +241,19 @@ class FollowingController extends AbstractController
 
                         $season->addEpisode($episode);
 
-                        $em->persist($episode);
+                        $this->em->persist($episode);
                     }
                 }
 
                 $seasonIndex++;
             }
 
-            $em->flush();
+            $this->em->flush();
         }
 
-        $user = $userRepository->find($id);
+        $user = $this->getUser();
 
-        $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
+        $showTracking = $this->followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
 
         // Add the tracking of the show
         if (is_null($showTracking)) {
@@ -245,7 +266,7 @@ class FollowingController extends AbstractController
 
             $following->setTvShow($show);
 
-            $em->persist($following);
+            $this->em->persist($following);
         }
 
         /* Add to the tracking the episodes specified in the request */
@@ -254,7 +275,7 @@ class FollowingController extends AbstractController
                 if ($seasonShow->getNumber() <= $seasonNumber) {
                     if($seasonShow->getNumber() == $seasonNumber) {
                         foreach ($seasonShow->getEpisodes() as $episodeShow) {
-                            $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
+                            $checkEpisodeTrackingStatus = $this->followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
                             
                             if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime() && $episodeShow->getNumber() <= $episodeNumber) {
                                 $following = new Following();
@@ -266,12 +287,12 @@ class FollowingController extends AbstractController
                                 $following->setSeason($seasonShow);
                                 
                                 $following->setEpisode($episodeShow);
-                                $em->persist($following);
+                                $this->em->persist($following);
                             }
                         }
                     } else {
                         foreach ($seasonShow->getEpisodes() as $episodeShow) {
-                            $checkEpisodeTrackingStatus = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
+                            $checkEpisodeTrackingStatus = $this->followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => $seasonShow, 'episode' => $episodeShow]);
                             
                             if (is_null($checkEpisodeTrackingStatus) && $episodeShow->getAirstamp() < new \DateTime()) {
                                 $following = new Following();
@@ -283,7 +304,7 @@ class FollowingController extends AbstractController
                                 $following->setSeason($seasonShow);
 
                                 $following->setEpisode($episodeShow);
-                                $em->persist($following);
+                                $this->em->persist($following);
                             }
                         }
                     }
@@ -291,35 +312,35 @@ class FollowingController extends AbstractController
             }
         }
 
-        $em->flush();
+        $this->em->flush();
 
-        $lastSeason = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show], ['id' => 'DESC']);
+        $lastSeason = $this->followingRepository->findOneBy(['user' => $user, 'tvShow' => $show], ['id' => 'DESC']);
 
         /* Auto setup the status of the tracking of the show related to the tracking of the episode */
         if (!is_null($lastSeason->getSeason())) {
             if ($lastSeason->getSeason()->getNumber() == $show->getSeasons()->count() && $lastSeason->getEpisode()->getNumber() == $lastSeason->getSeason()->getEpisodes()->last()->getNumber()) {
-                $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
+                $showTracking = $this->followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
 
                 $showTracking->setStatus(self::TRACKING_COMPLETED);
                 $showTracking->setEndDate(new \DateTime());
 
-                $em->persist($showTracking);
-                $em->flush();
+                $this->em->persist($showTracking);
+                $this->em->flush();
             } else if ($show->getStatus() == self::STATUS_RUNNING && !is_bool($show->getSeasons()->last()->getPremiereDate()) && (is_null($show->getSeasons()->last()->getPremiereDate()) || $show->getSeasons()->last()->getEpisodeCount() == 0 || $show->getSeasons()->last()->getPremiereDate() > new \DateTime() || is_null($show->getSeasons()->last()->getEpisodes()->first()->getAirstamp()) || (!is_null($show->getSeasons()->last()->getEpisodes()->first()->getAirstamp()) && $show->getSeasons()->last()->getEpisodes()->first()->getAirstamp() > new \DateTime()))) {
                 $previousSeasonId = $show->getSeasons()->last()->getId() - 1;
 
                 if ($lastSeason->getSeason()->getId() == $previousSeasonId) {
-                    $showTracking = $followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
+                    $showTracking = $this->followingRepository->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
 
                     $showTracking->setStatus(self::TRACKING_UPCOMING);
 
-                    $em->persist($showTracking);
-                    $em->flush();
+                    $this->em->persist($showTracking);
+                    $this->em->flush();
                 }
             }
         }
 
-        $em->clear();
+        $this->em->clear();
 
         $jsonResponse = new JsonResponse(['message' => 'success'], 200);
         
