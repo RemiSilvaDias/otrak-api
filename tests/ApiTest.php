@@ -2,11 +2,26 @@
 
 namespace App\Tests;
 
-// use PHPUnit\Framework\TestCase;
+use App\Entity\Show;
+use App\Entity\User;
+use App\Entity\Following;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ApiTest extends WebTestCase
 {
+    // Change the url if you don't run the test with the Symfony server
+    public const TEST_URL = 'http://localhost:8001/';
+    private $em;
+
+    protected function setUp()
+    {
+        $kernel = self::bootKernel();
+
+        $this->em = $kernel->getContainer()
+            ->get('doctrine')
+            ->getManager();
+    }
+    
     /**
      * Create an authentificated client for the tests
      *
@@ -30,6 +45,7 @@ class ApiTest extends WebTestCase
         );
 
         $data = json_decode($client->getResponse()->getContent(), true);
+        // print_r($data);
 
         $client = static::createClient();
         $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
@@ -37,53 +53,110 @@ class ApiTest extends WebTestCase
         return $client;
     }
 
-    public function testSearch()
+    public function testCreateUserApi()
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['email' => 'phpunit@oc.io']);
+
+        if(is_null($user)) {
+            $client = self::createClient();
+            $client->request(
+                'POST',
+                self::TEST_URL . 'api/users/new',
+                array(),
+                array(),
+                array('CONTENT_TYPE' => 'application/json'),
+                json_encode([
+                    'username' => 'testPhpunit',
+                    'email' => 'phpunit@oc.io',
+                    'password' => 'test'
+                ])
+            );
+
+            $this->assertTrue($client->getResponse()->isSuccessful());
+        } else {
+            $this->markTestSkipped('Already existing');
+        }
+    }
+
+    public function testLoginUserApi()
+    {
+        $client = $this->createAuthenticatedClient('phpunit@oc.io', 'test');
+
+        $this->assertNotEmpty($client);
+    }
+
+    public function testLoginApi()
+    {
+        $client = $this->createAuthenticatedClient('phpunit@oc.io', 'test');
+        $client->request('GET', self::TEST_URL . 'api/users/profile');
+
+        $this->assertTrue($client->getResponse()->isSuccessful());
+    }
+
+    public function testSearchApi()
     {
         $client = self::createClient();
-        $client->request('GET', 'http://localhost:8001/api/shows/search/game');
+        $client->request('GET', self::TEST_URL . 'api/shows/search/game');
 
         $this->assertTrue($client->getResponse()->isSuccessful());
     }
 
-    public function testAired()
+    public function testAiredApi()
     {
         $client = static::createClient();
-        $client->request('GET', 'http://localhost:8001/api/shows/aired');
+        $client->request('GET', self::TEST_URL . 'api/shows/aired');
+        $this->assertTrue($client->getResponse()->isSuccessful());
 
+        $client = $this->createAuthenticatedClient('phpunit@oc.io', 'test');
+        $client->request('GET', self::TEST_URL . 'api/shows/next');
         $this->assertTrue($client->getResponse()->isSuccessful());
     }
 
-    public function testLogin()
-    {
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', 'http://localhost:8001/api/users/profile');
-
-        $this->assertTrue($client->getResponse()->isSuccessful());
-    }
-
-    public function testNextShows()
+    public function testNextShowsApi()
     {
         $client = static::createClient();
-        $client->request('GET', 'http://localhost:8001/api/shows/next');
+        $client->request('GET', self::TEST_URL . 'api/shows/next');
 
         $this->assertEquals(401, $client->getResponse()->getStatusCode());
 
         // Test "Next shows" for connected user
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', 'http://localhost:8001/api/shows/next');
+        $client = $this->createAuthenticatedClient('phpunit@oc.io', 'test');
+        $client->request('GET', self::TEST_URL . 'api/shows/next');
 
         $this->assertTrue($client->getResponse()->isSuccessful());
     }
 
-    public function testNewFollowing()
+    public function testNewFollowingApi()
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', 'http://localhost:8001/api/users/profile');
+        $client = $this->createAuthenticatedClient('phpunit@oc.io', 'test');
+        $client->request('GET', self::TEST_URL . 'api/users/profile');
 
         $userId = \json_decode($client->getResponse()->getContent())->id;
 
-        $client->request('POST', "http://localhost:8001/api/followings/new/{$userId}/0/666/1/1");
+        $client->request('POST', self::TEST_URL . "api/followings/new/{$userId}/0/666/1/1");
 
+        $this->assertTrue($client->getResponse()->isSuccessful());
+    }
+
+    public function testDeleteFollowingApi()
+    {
+        $client = $this->createAuthenticatedClient('phpunit@oc.io', 'test');
+
+        $client->request('GET', self::TEST_URL . 'api/users/profile');
+        $userId = \json_decode($client->getResponse()->getContent())->id;
+        $user = $this->em->getRepository(User::class)->findOneBy(['id' => $userId]);
+        
+        $show = $this->em->getRepository(Show::class)->findOneBy(['id_tvmaze' => 666]);
+        $lastShowAdded = $this->em->getRepository(Following::class)->findOneBy(['user' => $user, 'tvShow' => $show, 'season' => null, 'episode' => null]);
+        
+        $client->request(
+            'DELETE',
+            self::TEST_URL . "api/followings/{$lastShowAdded->getId()}",
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([])
+        );
         $this->assertTrue($client->getResponse()->isSuccessful());
     }
 }
